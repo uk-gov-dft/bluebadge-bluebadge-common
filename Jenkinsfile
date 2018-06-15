@@ -11,7 +11,7 @@ node {
     stage('Clone sources') {
       git(
            url: "${REPONAME}",
-           credentialsId: 'githubsshkey',
+           credentialsId: 'username***REMOVED***-github-automation-uk-gov-dft',
            branch: "${BRANCH_NAME}"
         )
      }

@@ -18,11 +18,6 @@ plugins {
     id 'java'
 }
 
-group = 'uk.gov.dft.bluebadge.common'
-version = rootProject.file('VERSION').text.trim()
-sourceCompatibility = 1.8
-
-
 allprojects {
 
     apply plugin: 'java'
@@ -30,7 +25,6 @@ allprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'com.jfrog.artifactory'
 
-    group = 'uk.gov.dft.bluebadge'
     version = rootProject.file('VERSION').text.trim()
     sourceCompatibility = 1.8
 
@@ -52,8 +46,6 @@ artifactory {
     publish {
         repository {
             repoKey = 'gradle-dev-local'
-            username = "rob"
-             ***REMOVED***
             maven = true
         }
 
@@ -69,8 +61,6 @@ artifactory {
     resolve {
         repository {
             repoKey = 'gradle-release'
-            username = "rob"
-             ***REMOVED***
             maven = true
 
         }
