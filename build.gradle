@@ -1,0 +1,91 @@
+buildscript {
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            url 'https://artifactory.does.not.exist/artifactory/gradle-release'
+        }
+    }
+
+    dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
+    }
+}
+
+plugins {
+    id 'com.github.sherter.google-java-format' version '0.6'
+    id 'java'
+}
+
+group = 'uk.gov.dft.bluebadge.common'
+version = rootProject.file('VERSION').text.trim()
+sourceCompatibility = 1.8
+
+
+allprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    apply plugin: 'com.jfrog.artifactory'
+
+    group = 'uk.gov.dft.bluebadge'
+    version = rootProject.file('VERSION').text.trim()
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            url 'https://artifactory.does.not.exist/artifactory/gradle-release-dev'
+        }
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+artifactory {
+    contextUrl = "https://artifactory.does.not.exist/artifactory"   //The base Artifactory URL if not overridden by the publisher/resolver
+    publish {
+        repository {
+            repoKey = 'gradle-dev-local'
+            username = "rob"
+             ***REMOVED***
+            maven = true
+        }
+
+        publishArtifacts=true
+        publishPom=true
+        defaults {
+            publications('project_common')
+            publishArtifacts=true
+            publishPom=true
+        }
+    }
+
+    resolve {
+        repository {
+            repoKey = 'gradle-release'
+            username = "rob"
+             ***REMOVED***
+            maven = true
+
+        }
+    }
+
+}
+
+archivesBaseName = "bluebadge-common"
+compileJava.dependsOn 'googleJavaFormat'
+
+publishing {
+    publications {
+        project_common(MavenPublication) {
+            from components.java
+            artifactId "${archivesBaseName}"
+        }
+    }
+}
