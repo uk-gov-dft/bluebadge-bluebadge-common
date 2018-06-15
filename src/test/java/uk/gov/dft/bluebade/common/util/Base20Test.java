@@ -1,4 +1,4 @@
-package uk.gov.dft.bluebade.util;
+package uk.gov.dft.bluebade.common.util;
 
 import org.junit.Assert;
 import org.junit.Test;
