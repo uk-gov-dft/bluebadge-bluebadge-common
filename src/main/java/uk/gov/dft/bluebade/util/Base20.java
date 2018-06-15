@@ -6,20 +6,15 @@ package uk.gov.dft.bluebade.util;
  */
 public class Base20 {
 
-  private static final int BASE = 20;
-  private static final char symbols[] =
+  private static final double BASE = 20;
+  private static final char[] symbols =
       new char[] {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
         'J', 'K'
       };
 
-  public static void main(String args[]) {
-
-    for (int i = -101; i < 405; i++) {
-      System.out.println(
-          "i:" + i + " = " + Base20.encode(i) + ", decoded:" + Base20.decode(Base20.encode(i)));
-    }
-  }
+  // Prevent class construction
+  private Base20() {}
 
   /**
    * Encode a 0 or positive integer value to a Base20 String.
@@ -37,10 +32,10 @@ public class Base20 {
   }
 
   private static String convert(int number, int position, String result) {
-    if (number < Math.pow(BASE, position + 1)) {
+    if (number < Math.pow(BASE, position + 1d)) {
       return symbols[(number / (int) Math.pow(BASE, position))] + result;
     } else {
-      int remainder = (number % (int) Math.pow(BASE, position + 1));
+      int remainder = (number % (int) Math.pow(BASE, position + 1d));
       return convert(
           number - remainder,
           position + 1,
@@ -70,7 +65,7 @@ public class Base20 {
         accumulatedValue += charValue(base20String.toCharArray()[maxLength - 1]);
       } else {
         accumulatedValue +=
-            Math.pow(BASE, maxLength - position - 1) * charValue(base20String.charAt(position));
+            Math.pow(BASE, maxLength - position - 1d) * charValue(base20String.charAt(position));
       }
     }
 
