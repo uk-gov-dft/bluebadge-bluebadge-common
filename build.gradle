@@ -19,14 +19,31 @@ plugins {
     id 'java'
 }
 
+def getCurrentGitBranch() {
+    def gitBranch = "Unknown branch"
+    try {
+        def workingDir = new File("${project.projectDir}")
+        def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
+        result.waitFor()
+        if (result.exitValue() == 0) {
+            gitBranch = result.text.trim().replaceAll('/','_')
+            if (gitBranch == 'develop') {
+                gitBranch = 'SNAPSHOT'
+            }
+        }
+    } catch (e) {
+    }
+    return gitBranch
+}
+
 allprojects {
 
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
     apply plugin: 'com.jfrog.artifactory'
-
-    version = rootProject.file('VERSION').text.trim()
+    group = 'uk.gov.dft.bluebadge'
+    version = rootProject.file('VERSION').text.trim() + '-' + getCurrentGitBranch()
     sourceCompatibility = 1.8
 
     repositories {
