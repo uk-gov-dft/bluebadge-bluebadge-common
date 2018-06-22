@@ -17,14 +17,22 @@ node {
      }
 
     stage ('Gradle build') {
-        sh './gradlew clean build test artifactoryPublish artifactoryDeploy'
+        try {
+            sh './gradlew clean build test artifactoryPublish artifactoryDeploy'
+        }
+        finally {
+            junit '**/TEST*.xml'
+        }
     }
 
     stage('SonarQube analysis') {
+
         withSonarQubeEnv('sonarqube') {
-              // requires SonarQube Scanner for Gradle 2.1+
-              // It's important to add --info because of SONARJNKNS-281
-              sh './gradlew --info sonarqube'
+            def ver = readFile('VERSION').trim()
+            echo "Version: " + ver
+            // requires SonarQube Scanner for Gradle 2.1+
+            // It's important to add --info because of SONARJNKNS-281
+            sh "./gradlew --info sonarqube -Dsonar.projectName=bluebadge-common -Dsonar.projectVersion=${ver} -Dsonar.branch=${BRANCH_NAME}"
         }
     }
 }
