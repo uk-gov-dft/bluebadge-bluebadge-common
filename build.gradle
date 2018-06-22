@@ -16,6 +16,7 @@ buildscript {
 plugins {
     id 'com.github.sherter.google-java-format' version '0.6'
     id "org.sonarqube" version "2.6.2"
+    id 'net.saliman.cobertura' version '2.5.4'
     id 'java'
 }
 
@@ -39,10 +40,12 @@ def getCurrentGitBranch() {
 allprojects {
 
     apply plugin: 'java'
+    apply plugin: 'idea'
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
     apply plugin: 'com.jfrog.artifactory'
     apply plugin: 'jacoco'
+    apply plugin: 'checkstyle'
     group = 'uk.gov.dft.bluebadge'
     version = rootProject.file('VERSION').text.trim() + '-' + getCurrentGitBranch()
     sourceCompatibility = 1.8
@@ -51,7 +54,7 @@ allprojects {
         mavenCentral()
         jcenter()
         maven {
-            url 'https://artifactory.does.not.exist/artifactory/gradle-release-dev'
+            url 'https://artifactory.does.not.exist/artifactory/gradle-dev-local'
         }
     }
 }
@@ -88,11 +91,6 @@ artifactory {
 }
 
 archivesBaseName = "bluebadge-common"
-compileJava.dependsOn 'googleJavaFormat'
-
-jacoco {
-    toolVersion = "0.8.1"
-}
 
 publishing {
     publications {
@@ -102,3 +100,15 @@ publishing {
         }
     }
 }
+
+
+compileJava.dependsOn 'googleJavaFormat'
+
+checkstyle {
+    toolVersion "8.9"
+}
+
+jacoco {
+    toolVersion = "0.8.1"
+}
+
