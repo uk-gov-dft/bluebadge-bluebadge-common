@@ -35,4 +35,14 @@ node {
             sh "./gradlew --info sonarqube -Dsonar.projectName=bluebadge-common -Dsonar.projectVersion=${ver} -Dsonar.branch=${BRANCH_NAME}"
         }
     }
+
+    stage("Quality Gate") {
+        timeout(time: 5, unit: 'MINUTES') {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+            }
+        }
+    }
+
 }
