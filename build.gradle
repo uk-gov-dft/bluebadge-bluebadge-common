@@ -19,21 +19,25 @@ plugins {
     id 'java'
 }
 
-def getCurrentGitBranch() {
-    def gitBranch = "Unknown branch"
-    try {
-        def workingDir = new File("${project.projectDir}")
-        def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
-        result.waitFor()
-        if (result.exitValue() == 0) {
-            gitBranch = result.text.trim().replaceAll('/','_')
-            if (gitBranch == 'develop') {
-                gitBranch = 'SNAPSHOT'
-            }
+def getTheVersion() {
+    def version = rootProject.file('VERSION').text.trim()
+    def versionSuffix = "Unknown"
+    def workingDir = new File("${project.projectDir}")
+    def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
+    result.waitFor()
+    if (result.exitValue() == 0) {
+        def gitBranch = result.text.trim().replaceAll('/','_')
+        if (gitBranch == 'develop') {
+            gitBranch = 'SNAPSHOT'
         }
-    } catch (e) {
+        if (gitBranch == 'master') {
+            versionSuffix = '' 
+        } else {
+            versionSuffix = '-' + gitBranch
+        }
+        
     }
-    return gitBranch
+    return version + versionSuffix
 }
 
 allprojects {
@@ -45,7 +49,7 @@ allprojects {
     apply plugin: 'com.jfrog.artifactory'
     apply plugin: 'jacoco'
     group = 'uk.gov.dft.bluebadge'
-    version = rootProject.file('VERSION').text.trim() + '-' + getCurrentGitBranch()
+    version = getTheVersion()
     sourceCompatibility = 1.8
 
     repositories {
