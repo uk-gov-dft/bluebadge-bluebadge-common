@@ -1,4 +1,4 @@
-package uk.gov.dft.bluebade.common.util;
+package uk.gov.dft.bluebadge.common.util;
 
 /**
  * Provides utlitties to convert between integer and Base20 strings. Note. Misses out the 'I' so the

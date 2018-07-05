@@ -1,4 +1,4 @@
-package uk.gov.dft.bluebade.common.util;
+package uk.gov.dft.bluebadge.common.util;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -6,7 +6,7 @@ import org.junit.Test;
 public class Base20Test {
 
   private static final String BASE20_ENCODED = "31E";
-  public static final int DECODED_INT = 1234;
+  private static final int DECODED_INT = 1234;
 
   @Test(expected = IllegalArgumentException.class)
   public void encodeNegative() {
