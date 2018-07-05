@@ -2,7 +2,7 @@ package uk.gov.dft.bluebadge.common.service.exception;
 
 import com.google.common.collect.Lists;
 import org.springframework.http.HttpStatus;
-import uk.gov.dft.bluebadge.common.api.domain.ErrorErrors;
+import uk.gov.dft.bluebadge.common.api.model.ErrorErrors;
 
 import java.util.List;
 

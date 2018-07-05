@@ -3,8 +3,8 @@ package uk.gov.dft.bluebadge.common.service.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.dft.bluebadge.common.api.domain.CommonResponse;
-import uk.gov.dft.bluebadge.common.api.domain.Error;
+import uk.gov.dft.bluebadge.common.api.model.CommonResponse;
+import uk.gov.dft.bluebadge.common.api.model.Error;
 
 public abstract class ServiceException extends RuntimeException {
   final transient CommonResponse commonResponse;

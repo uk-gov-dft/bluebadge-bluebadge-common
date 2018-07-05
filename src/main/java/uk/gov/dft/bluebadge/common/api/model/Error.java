@@ -1,4 +1,4 @@
-package uk.gov.dft.bluebadge.common.api.domain;
+package uk.gov.dft.bluebadge.common.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
