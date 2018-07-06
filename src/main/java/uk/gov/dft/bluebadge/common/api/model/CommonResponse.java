@@ -7,7 +7,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import java.util.Objects;
 
-/** CommonResponse */
+/**
+ * CommonResponse model that wraps all API responses.
+ */
 @Validated
 public class CommonResponse {
   @JsonProperty("apiVersion")

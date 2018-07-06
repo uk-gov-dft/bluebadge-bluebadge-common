@@ -58,10 +58,22 @@ public class CommonResponseEntityExceptionHandlerTest {
   }
 
   @Test
-  public void shouldReportFieldErrors() {
+  public void shoudReportFieldErrors() {
+    reportFieldErrors(ERROR_CODES);
+    reportFieldErrors(new String[] {});
+  }
+
+  @Test
+  public void shouldReportClassLevelErrors() {
+    reportClassLevelErrors(ERROR_CODES);
+    reportClassLevelErrors(new String[] {});
+  }
+
+
+  private void reportFieldErrors(String[] errorCodes) {
 
     // Given
-    when(mockBindingResult.getFieldErrors()).thenReturn(createFieldErrors());
+    when(mockBindingResult.getFieldErrors()).thenReturn(createFieldErrors(errorCodes));
 
     // When
     ResponseEntity<Object> result = handler.handleMethodArgumentNotValid(mockException, mockHeaders, HttpStatus.BAD_REQUEST, mockRequest);
@@ -75,7 +87,11 @@ public class CommonResponseEntityExceptionHandlerTest {
     ErrorErrors errorErrors = response.getError().getErrors().get(0);
     assertThat(errorErrors.getField()).isEqualTo(ERROR_FIELD);
     assertThat(errorErrors.getReason()).isEqualTo(ERROR_DEFAULT_MESSAGE);
-    assertThat(errorErrors.getMessage()).isEqualTo(ERROR_CODES[0]);
+    if (errorCodes.length == 0) {
+      assertThat(errorErrors.getMessage()).isEqualTo("Unknown");
+    } else {
+      assertThat(errorErrors.getMessage()).isEqualTo(errorCodes[0]);
+    }
 
   }
 
@@ -85,11 +101,11 @@ public class CommonResponseEntityExceptionHandlerTest {
     assertThat(response.getError().getErrors().size()).isEqualTo(1);
   }
 
-  @Test
-  public void shouldReportClassLevelErrors() {
+
+  private void reportClassLevelErrors(String[] errorCodes) {
 
     // Given
-    when(mockBindingResult.getGlobalErrors()).thenReturn(createObjectErrors());
+    when(mockBindingResult.getGlobalErrors()).thenReturn(createObjectErrors(errorCodes));
 
     // When
     ResponseEntity<Object> result = handler.handleMethodArgumentNotValid(mockException, mockHeaders, HttpStatus.BAD_REQUEST, mockRequest);
@@ -102,7 +118,11 @@ public class CommonResponseEntityExceptionHandlerTest {
     ErrorErrors errorErrors = response.getError().getErrors().get(0);
     assertThat(errorErrors.getField()).isNull();
     assertThat(errorErrors.getReason()).isEqualTo(ERROR_DEFAULT_MESSAGE);
-    assertThat(errorErrors.getMessage()).isEqualTo(ERROR_CODES[0]);
+    if (errorCodes.length == 0) {
+      assertThat(errorErrors.getMessage()).isEqualTo("Unknown");
+    } else {
+      assertThat(errorErrors.getMessage()).isEqualTo(errorCodes[0]);
+    }
 
   }
 
@@ -113,15 +133,15 @@ public class CommonResponseEntityExceptionHandlerTest {
     assertThat(result.getBody()).isInstanceOf(CommonResponse.class);
   }
 
-  private List<ObjectError> createObjectErrors() {
+  private List<ObjectError> createObjectErrors(String[] errorCodes) {
     List<ObjectError> errors = new ArrayList<>();
-    errors.add(new ObjectError(ERROR_OBJECT, ERROR_CODES, ERROR_ARGUMENTS, ERROR_DEFAULT_MESSAGE));
+    errors.add(new ObjectError(ERROR_OBJECT, errorCodes, ERROR_ARGUMENTS, ERROR_DEFAULT_MESSAGE));
     return errors;
   }
 
-  private List<FieldError> createFieldErrors() {
+  private List<FieldError> createFieldErrors(String[] errorCodes) {
     List<FieldError> errors = new ArrayList<>();
-    errors.add(new FieldError(ERROR_OBJECT, ERROR_FIELD, REJECTED_VALUE, IS_BINDING_FAILURE, ERROR_CODES, ERROR_ARGUMENTS, ERROR_DEFAULT_MESSAGE));
+    errors.add(new FieldError(ERROR_OBJECT, ERROR_FIELD, REJECTED_VALUE, IS_BINDING_FAILURE, errorCodes, ERROR_ARGUMENTS, ERROR_DEFAULT_MESSAGE));
     return errors;
   }
 }

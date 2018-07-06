@@ -13,10 +13,10 @@ import java.io.IOException;
 public class StringTrimmerDeserializer extends JsonDeserializer<String> {
 
   @Override
-  public String deserialize(final JsonParser p, final DeserializationContext ctxt)
+  public String deserialize(final JsonParser jsonParser, final DeserializationContext context)
       throws IOException {
 
-    String result = StringDeserializer.instance.deserialize(p, ctxt);
+    String result = StringDeserializer.instance.deserialize(jsonParser, context);
     return StringUtils.trimToNull(result);
   }
 }

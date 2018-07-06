@@ -17,11 +17,11 @@ import uk.gov.dft.bluebadge.common.api.model.ErrorErrors;
 public class CommonResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
   @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid (
-      MethodArgumentNotValidException ex,
-      HttpHeaders headers,
-      HttpStatus status,
-      WebRequest request) {
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+    MethodArgumentNotValidException ex,
+    HttpHeaders headers,
+    HttpStatus status,
+    WebRequest request) {
 
     CommonResponse commonResponse = new CommonResponse();
     Error systemError = new Error();
@@ -34,10 +34,10 @@ public class CommonResponseEntityExceptionHandler extends ResponseEntityExceptio
         messageProperty = error.getCodes()[0];
       }
       systemError.addErrorsItem(
-          new ErrorErrors()
-              .field(error.getField())
-              .message(messageProperty)
-              .reason(error.getDefaultMessage()));
+        new ErrorErrors()
+          .field(error.getField())
+          .message(messageProperty)
+          .reason(error.getDefaultMessage()));
     }
 
     // Don't expect to get any object errors.
@@ -49,7 +49,7 @@ public class CommonResponseEntityExceptionHandler extends ResponseEntityExceptio
         messageProperty = error.getCodes()[0];
       }
       systemError.addErrorsItem(
-          new ErrorErrors().field(null).message(messageProperty).reason(error.getDefaultMessage()));
+        new ErrorErrors().field(null).message(messageProperty).reason(error.getDefaultMessage()));
     }
 
     commonResponse.setError(systemError);

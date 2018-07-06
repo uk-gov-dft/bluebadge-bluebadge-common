@@ -19,7 +19,7 @@ public class Base20 {
   /**
    * Encode a 0 or positive integer value to a Base20 String.
    *
-   * @param number
+   * @param number The number you want converting
    * @return a Base20 encoded String.
    * @throws IllegalArgumentException when the integer supplied is not valid.
    */
@@ -46,7 +46,7 @@ public class Base20 {
   /**
    * Decode a Base20 encoded String to its decimal counterpart.
    *
-   * @param base20String
+   * @param base20String The String you want converting back to base 10.
    * @return an integer value.
    * @throws IllegalArgumentException thrown when the encoded String supplied is either null or zero
    *     length or contains an invalid character.
