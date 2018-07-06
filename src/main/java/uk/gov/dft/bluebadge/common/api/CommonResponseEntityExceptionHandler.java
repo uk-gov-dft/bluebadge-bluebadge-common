@@ -17,7 +17,7 @@ import uk.gov.dft.bluebadge.common.api.model.ErrorErrors;
 public class CommonResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
   @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+  protected ResponseEntity<Object> handleMethodArgumentNotValid (
       MethodArgumentNotValidException ex,
       HttpHeaders headers,
       HttpStatus status,
