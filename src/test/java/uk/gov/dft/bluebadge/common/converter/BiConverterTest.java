@@ -1,13 +1,11 @@
 package uk.gov.dft.bluebadge.common.converter;
 
-import org.junit.Test;
-import uk.gov.dft.bluebadge.common.service.exception.BadRequestException;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
+import org.junit.Test;
+import uk.gov.dft.bluebadge.common.service.exception.BadRequestException;
 
 public class BiConverterTest {
 
@@ -15,17 +13,18 @@ public class BiConverterTest {
   public void convertToModelList() {
 
     // Given
-    BiConverter<String, String> testConverter = new BiConverter<String, String>() {
-      @Override
-      public String convertToEntity(String model) throws BadRequestException {
-        return null;
-      }
+    BiConverter<String, String> testConverter =
+        new BiConverter<String, String>() {
+          @Override
+          public String convertToEntity(String model) throws BadRequestException {
+            return null;
+          }
 
-      @Override
-      public String convertToModel(String entity) {
-        return entity;
-      }
-    };
+          @Override
+          public String convertToModel(String entity) {
+            return entity;
+          }
+        };
 
     String[] values = {"Fred", "James", "Dotty"};
     List<String> strings = Arrays.asList(values);
@@ -34,6 +33,5 @@ public class BiConverterTest {
     List<String> result = testConverter.convertToModelList(strings);
 
     assertThat(result).contains(values);
-
   }
 }

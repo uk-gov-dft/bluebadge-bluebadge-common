@@ -2,12 +2,11 @@ package uk.gov.dft.bluebadge.common.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 
 /** Error */
 @Validated
