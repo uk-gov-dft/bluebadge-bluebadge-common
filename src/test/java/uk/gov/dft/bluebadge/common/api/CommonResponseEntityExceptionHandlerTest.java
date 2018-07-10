@@ -1,5 +1,11 @@
 package uk.gov.dft.bluebadge.common.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,14 +22,6 @@ import org.springframework.web.context.request.WebRequest;
 import uk.gov.dft.bluebadge.common.api.model.CommonResponse;
 import uk.gov.dft.bluebadge.common.api.model.ErrorErrors;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-
 @RunWith(JUnit4.class)
 public class CommonResponseEntityExceptionHandlerTest {
 
@@ -37,24 +35,19 @@ public class CommonResponseEntityExceptionHandlerTest {
 
   private CommonResponseEntityExceptionHandler handler;
 
-  @Mock
-  private MethodArgumentNotValidException mockException;
+  @Mock private MethodArgumentNotValidException mockException;
 
-  @Mock
-  private HttpHeaders mockHeaders;
+  @Mock private HttpHeaders mockHeaders;
 
-  @Mock
-  private WebRequest mockRequest;
+  @Mock private WebRequest mockRequest;
 
-  @Mock
-  private BindingResult mockBindingResult;
+  @Mock private BindingResult mockBindingResult;
 
   @Before
   public void setup() {
     initMocks(this);
     when(mockException.getBindingResult()).thenReturn(mockBindingResult);
     handler = new CommonResponseEntityExceptionHandler();
-
   }
 
   @Test
@@ -69,14 +62,15 @@ public class CommonResponseEntityExceptionHandlerTest {
     reportClassLevelErrors(new String[] {});
   }
 
-
   private void reportFieldErrors(String[] errorCodes) {
 
     // Given
     when(mockBindingResult.getFieldErrors()).thenReturn(createFieldErrors(errorCodes));
 
     // When
-    ResponseEntity<Object> result = handler.handleMethodArgumentNotValid(mockException, mockHeaders, HttpStatus.BAD_REQUEST, mockRequest);
+    ResponseEntity<Object> result =
+        handler.handleMethodArgumentNotValid(
+            mockException, mockHeaders, HttpStatus.BAD_REQUEST, mockRequest);
 
     // Then
     assertErrorReturned(result);
@@ -92,7 +86,6 @@ public class CommonResponseEntityExceptionHandlerTest {
     } else {
       assertThat(errorErrors.getMessage()).isEqualTo(errorCodes[0]);
     }
-
   }
 
   private void assertCommonResponseError(CommonResponse response) {
@@ -101,14 +94,15 @@ public class CommonResponseEntityExceptionHandlerTest {
     assertThat(response.getError().getErrors().size()).isEqualTo(1);
   }
 
-
   private void reportClassLevelErrors(String[] errorCodes) {
 
     // Given
     when(mockBindingResult.getGlobalErrors()).thenReturn(createObjectErrors(errorCodes));
 
     // When
-    ResponseEntity<Object> result = handler.handleMethodArgumentNotValid(mockException, mockHeaders, HttpStatus.BAD_REQUEST, mockRequest);
+    ResponseEntity<Object> result =
+        handler.handleMethodArgumentNotValid(
+            mockException, mockHeaders, HttpStatus.BAD_REQUEST, mockRequest);
 
     // Then
     assertErrorReturned(result);
@@ -123,7 +117,6 @@ public class CommonResponseEntityExceptionHandlerTest {
     } else {
       assertThat(errorErrors.getMessage()).isEqualTo(errorCodes[0]);
     }
-
   }
 
   private void assertErrorReturned(ResponseEntity<Object> result) {
@@ -141,7 +134,15 @@ public class CommonResponseEntityExceptionHandlerTest {
 
   private List<FieldError> createFieldErrors(String[] errorCodes) {
     List<FieldError> errors = new ArrayList<>();
-    errors.add(new FieldError(ERROR_OBJECT, ERROR_FIELD, REJECTED_VALUE, IS_BINDING_FAILURE, errorCodes, ERROR_ARGUMENTS, ERROR_DEFAULT_MESSAGE));
+    errors.add(
+        new FieldError(
+            ERROR_OBJECT,
+            ERROR_FIELD,
+            REJECTED_VALUE,
+            IS_BINDING_FAILURE,
+            errorCodes,
+            ERROR_ARGUMENTS,
+            ERROR_DEFAULT_MESSAGE));
     return errors;
   }
 }

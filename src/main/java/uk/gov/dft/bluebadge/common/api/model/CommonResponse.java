@@ -2,14 +2,11 @@ package uk.gov.dft.bluebadge.common.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.Objects;
+import javax.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import java.util.Objects;
-
-/**
- * CommonResponse model that wraps all API responses.
- */
+/** CommonResponse model that wraps all API responses. */
 @Validated
 public class CommonResponse {
   @JsonProperty("apiVersion")

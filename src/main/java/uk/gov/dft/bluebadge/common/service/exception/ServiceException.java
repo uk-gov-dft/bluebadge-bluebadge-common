@@ -1,6 +1,5 @@
 package uk.gov.dft.bluebadge.common.service.exception;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.dft.bluebadge.common.api.model.CommonResponse;
