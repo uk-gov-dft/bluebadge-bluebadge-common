@@ -118,6 +118,8 @@ artifactory {
 }
 
 bootJar.enabled = false
+jar.enabled = true
+
 archivesBaseName = "bluebadge-common"
 
 publishing {
