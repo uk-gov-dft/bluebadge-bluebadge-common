@@ -8,7 +8,7 @@ import uk.gov.dft.bluebadge.common.security.model.User;
 
 @Component
 public class SecurityUtils {
-  private static final int MOCK_LOCAL_AUTHORITY = 22;
+  private static final int MOCK_LOCAL_AUTHORITY = 2;
   private static final Integer MOCK_ROLE_ID = 1;
 
   /**

@@ -8,4 +8,5 @@ import lombok.Data;
 @Builder
 public class LocalAuthority {
   private int id;
+  private String shortCode;
 }
