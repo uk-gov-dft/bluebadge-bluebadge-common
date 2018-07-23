@@ -19,11 +19,9 @@ public class SecurityUtilsTest {
   private static final String DEFAULT_EMAIL_ADDRESS = "fred@bloggs.com";
   private static final int MOCK_LOCAL_AUTHORITY_ID = 22;
 
-  @Mock
-  private SecurityContext mockSecurityContext;
+  @Mock private SecurityContext mockSecurityContext;
 
-  @Mock
-  private Authentication mockAuthentication;
+  @Mock private Authentication mockAuthentication;
 
   private SecurityUtils securityUtils;
 
@@ -46,7 +44,6 @@ public class SecurityUtilsTest {
 
     // then
     assertThat(currentUserDetails.getEmailAddress(), is(DEFAULT_EMAIL_ADDRESS));
-
   }
 
   @Test
@@ -58,6 +55,5 @@ public class SecurityUtilsTest {
 
     // then
     assertThat(currentLocalAuthority.getId(), is(MOCK_LOCAL_AUTHORITY_ID));
-
   }
 }

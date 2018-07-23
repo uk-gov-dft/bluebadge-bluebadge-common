@@ -13,6 +13,7 @@ public class SecurityUtils {
 
   /**
    * Returns the currently logged in user.
+   *
    * @return
    */
   public User getCurrentUserDetails() {
@@ -20,22 +21,21 @@ public class SecurityUtils {
     Authentication authentication = getCurrentAuthenticationContext();
 
     return User.builder()
-      .localAuthority(createMockLocalAuthority())
-      .emailAddress(authentication.getName())
-      .name("TODO SecurityUtils")
-      .roleId(MOCK_ROLE_ID)
-      .build();
-
+        .localAuthority(createMockLocalAuthority())
+        .emailAddress(authentication.getName())
+        .name("TODO SecurityUtils")
+        .roleId(MOCK_ROLE_ID)
+        .build();
   }
 
   /**
    * Returns the LocalAuthority as provided in the security credentials.
+   *
    * @return
    */
   public LocalAuthority getCurrentLocalAuthority() {
     return createMockLocalAuthority();
   }
-
 
   // TODO: This should be replaced with a conctrete implemention of something real.
   private LocalAuthority createMockLocalAuthority() {
@@ -44,6 +44,7 @@ public class SecurityUtils {
 
   /**
    * Get the current authentication context.
+   *
    * @return The authentication context
    * @throws NullPointerException when the authentication context cannot be found.
    */
@@ -55,6 +56,5 @@ public class SecurityUtils {
       throw new NullPointerException("No user currently authenticated.");
     }
     return authentication;
-
   }
 }
