@@ -17,7 +17,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class SecurityUtilsTest {
 
   private static final String DEFAULT_EMAIL_ADDRESS = "fred@bloggs.com";
-  private static final int MOCK_LOCAL_AUTHORITY_ID = 22;
+  private static final int MOCK_LOCAL_AUTHORITY_ID = 2;
 
   @Mock private SecurityContext mockSecurityContext;
 
