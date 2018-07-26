@@ -46,6 +46,12 @@ def getTheVersion() {
     return version + versionSuffix
 }
 
+task outputComputedVersion {
+    def computedVersion = new File('VERSION-computed')
+    computedVersion.delete()
+    computedVersion.write(getTheVersion())
+}
+
 allprojects {
 
     apply plugin: 'java'
@@ -137,4 +143,6 @@ compileJava.dependsOn 'googleJavaFormat'
 jacoco {
     toolVersion = "0.8.1"
 }
+
+build.finalizedBy(outputComputedVersion)
 
