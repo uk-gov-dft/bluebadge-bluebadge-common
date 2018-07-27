@@ -4,6 +4,8 @@ import java.util.Collection;
 
 public class Matchers {
 
+  private Matchers() {}
+
   public static class CollectionMatchers {
     private Collection<?> collection;
 
