@@ -41,9 +41,9 @@ public class SecurityUtils {
   // TODO: This should be replaced with a conctrete implemention of something real.
   private LocalAuthority createMockLocalAuthority() {
     return LocalAuthority.builder()
-      .id(MOCK_LOCAL_AUTHORITY)
-      .shortCode(MOCK_LOCAL_AUTHORITY_SHORT_CODE)
-      .build();
+        .id(MOCK_LOCAL_AUTHORITY)
+        .shortCode(MOCK_LOCAL_AUTHORITY_SHORT_CODE)
+        .build();
   }
 
   /**
