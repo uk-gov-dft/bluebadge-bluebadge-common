@@ -1,5 +1,6 @@
 package uk.gov.dft.bluebadge.common.api.common;
 
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,12 +14,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 @AllArgsConstructor
 public class ServiceConfiguration {
 
-  @NonNull private String scheme;
-  @NonNull private String host;
-  @NonNull private Integer port;
+  @NonNull @NotNull private String scheme;
+  @NonNull @NotNull private String host;
+  @NonNull @NotNull private Integer port;
   private Integer connectiontimeout;
   private Integer requesttimeout;
-  @NonNull private String contextpath;
+  @NonNull @NotNull private String contextpath;
 
   public String getUrlPrefix() {
     return UriComponentsBuilder.newInstance()
