@@ -10,7 +10,7 @@ import uk.gov.dft.bluebadge.common.security.model.User;
 public class SecurityUtils {
   private static final int MOCK_LOCAL_AUTHORITY = 2;
   private static final Integer MOCK_ROLE_ID = 1;
-  private static final String MOCK_LOCAL_AUTHORITY_SHORT_CODE = "BIRM";
+  private static final String MOCK_LOCAL_AUTHORITY_SHORT_CODE = "ABERD";
 
   /**
    * Returns the currently logged in user.
