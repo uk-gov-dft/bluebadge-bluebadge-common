@@ -1,7 +1,6 @@
 package uk.gov.dft.bluebadge.common.api.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import static org.assertj.core.api.Java6Assertions.fail;
 
 import java.util.Set;
