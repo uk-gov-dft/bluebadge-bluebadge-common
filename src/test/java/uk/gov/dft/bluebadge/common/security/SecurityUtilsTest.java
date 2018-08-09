@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
 import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
@@ -46,6 +47,9 @@ public class SecurityUtilsTest {
     securityUtils = new SecurityUtils();
     SecurityContextHolder.setContext(mockSecurityContext);
     auth2Authentication = new OAuth2Authentication(request, userAuthentication);
+  }
+
+  private void setupAuthenticationDetails() {
     HttpServletRequest mockHttpRequest = mock(HttpServletRequest.class);
     OAuth2AuthenticationDetails details = new OAuth2AuthenticationDetails(mockHttpRequest);
     details.setDecodedDetails(ImmutableMap.of("local-authority", TEST_LA_SHORT_CODE));
@@ -57,6 +61,7 @@ public class SecurityUtilsTest {
 
     // given
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    setupAuthenticationDetails();
 
     // when
     User currentUserDetails = securityUtils.getCurrentUserDetails();
@@ -71,11 +76,42 @@ public class SecurityUtilsTest {
   public void shouldReturnAValidLocalAuthority() {
     // given
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    setupAuthenticationDetails();
 
     // when
     String currentLocalAuthority = securityUtils.getCurrentLocalAuthorityShortCode();
 
     // then
     assertThat(currentLocalAuthority).isEqualTo(TEST_LA_SHORT_CODE);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void whenAuthenticationNull_thenException() {
+    securityUtils.getCurrentUserDetails();
+  }
+  @Test(expected = IllegalStateException.class)
+  public void whenNotOAuthAuthentication_thenException() {
+    // given
+    when(mockSecurityContext.getAuthentication()).thenReturn(userAuthentication);
+
+    // when
+    securityUtils.getCurrentUserDetails();
+  }
+  @Test(expected = NullPointerException.class)
+  public void whenAuthenticationDetailsNull_thenException() {
+    // given
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+
+    // when
+    securityUtils.getCurrentUserDetails();
+  }
+  @Test(expected = IllegalStateException.class)
+  public void whenAuthenticationDetailsNotAsExpected_thenException() {
+    // given
+    auth2Authentication.setDetails(new ArrayList<>());
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+
+    // when
+    securityUtils.getCurrentUserDetails();
   }
 }
