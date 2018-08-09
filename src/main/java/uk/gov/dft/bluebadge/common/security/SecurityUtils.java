@@ -1,16 +1,16 @@
 package uk.gov.dft.bluebadge.common.security;
 
+import java.util.Map;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import uk.gov.dft.bluebadge.common.security.model.LocalAuthority;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+
 import uk.gov.dft.bluebadge.common.security.model.User;
 
-@Component
 public class SecurityUtils {
-  private static final int MOCK_LOCAL_AUTHORITY = 2;
-  private static final Integer MOCK_ROLE_ID = 1;
-  private static final String MOCK_LOCAL_AUTHORITY_SHORT_CODE = "ABERD";
+  public static final String LOCAL_AUTHORITY_KEY = "local-authority";
 
   /**
    * Returns the currently logged in user.
@@ -19,13 +19,31 @@ public class SecurityUtils {
    */
   public User getCurrentUserDetails() {
 
-    Authentication authentication = getCurrentAuthenticationContext();
+    OAuth2Authentication authentication = getCurrentAuthenticationContext();
+
+    if (authentication.getDetails() == null) {
+      throw new NullPointerException("Authentication details is null.");
+    } else if (!(authentication.getDetails() instanceof OAuth2AuthenticationDetails)) {
+      throw new IllegalStateException(
+          "Authentication details of unsupported type: " + authentication.getDetails().getClass());
+    }
+
+    OAuth2AuthenticationDetails oauthDetails =
+        (OAuth2AuthenticationDetails) authentication.getDetails();
+    Map<String, String> additionalInfo = (Map<String, String>) oauthDetails.getDecodedDetails();
+
+    String roleName =
+        authentication
+            .getAuthorities()
+            .stream()
+            .findFirst()
+            .map(GrantedAuthority::getAuthority)
+            .orElseThrow(() -> new NullPointerException("Authentication has no authorities."));
 
     return User.builder()
-        .localAuthority(createMockLocalAuthority())
         .emailAddress(authentication.getName())
-        .name("TODO SecurityUtils")
-        .roleId(MOCK_ROLE_ID)
+        .roleName(roleName)
+        .localAuthorityShortCode(extractLocalAuthorityShortCode(additionalInfo))
         .build();
   }
 
@@ -34,16 +52,12 @@ public class SecurityUtils {
    *
    * @return
    */
-  public LocalAuthority getCurrentLocalAuthority() {
-    return createMockLocalAuthority();
+  public String getCurrentLocalAuthorityShortCode() {
+    return getCurrentUserDetails().getLocalAuthorityShortCode();
   }
 
-  // TODO: This should be replaced with a conctrete implemention of something real.
-  private LocalAuthority createMockLocalAuthority() {
-    return LocalAuthority.builder()
-        .id(MOCK_LOCAL_AUTHORITY)
-        .shortCode(MOCK_LOCAL_AUTHORITY_SHORT_CODE)
-        .build();
+  private String extractLocalAuthorityShortCode(Map<String, String> additionalInfo) {
+    return additionalInfo.get(LOCAL_AUTHORITY_KEY);
   }
 
   /**
@@ -52,13 +66,15 @@ public class SecurityUtils {
    * @return The authentication context
    * @throws NullPointerException when the authentication context cannot be found.
    */
-  private Authentication getCurrentAuthenticationContext() {
+  private OAuth2Authentication getCurrentAuthenticationContext() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-    // Would be a coding error if this called for a non-authenticated area.
     if (null == authentication) {
       throw new NullPointerException("No user currently authenticated.");
+    } else if (!(authentication instanceof OAuth2Authentication)) {
+      throw new IllegalStateException(
+          "Authentication of unsupported type: " + authentication.getClass());
     }
-    return authentication;
+    return (OAuth2Authentication) authentication;
   }
 }

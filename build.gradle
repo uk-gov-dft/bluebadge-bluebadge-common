@@ -33,15 +33,13 @@ def getTheVersion() {
     result.waitFor()
     if (result.exitValue() == 0) {
         def gitBranch = result.text.trim().replaceAll('/','_')
-        if (gitBranch == 'develop') {
-            gitBranch = 'SNAPSHOT'
-        }
         if (gitBranch == 'master') {
             versionSuffix = '' 
+        } else if (gitBranch == 'develop') {
+            versionSuffix = '-SNAPSHOT'
         } else {
-            versionSuffix = '-' + gitBranch
+            versionSuffix = '-' + gitBranch + '-SNAPSHOT'
         }
-        
     }
     return version + versionSuffix
 }

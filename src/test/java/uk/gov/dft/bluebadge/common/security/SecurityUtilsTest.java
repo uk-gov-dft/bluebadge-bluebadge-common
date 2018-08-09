@@ -1,59 +1,81 @@
 package uk.gov.dft.bluebadge.common.security;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import uk.gov.dft.bluebadge.common.security.model.LocalAuthority;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import uk.gov.dft.bluebadge.common.security.model.User;
 
 public class SecurityUtilsTest {
 
   private static final String DEFAULT_EMAIL_ADDRESS = "fred@bloggs.com";
-  private static final int MOCK_LOCAL_AUTHORITY_ID = 2;
+  private static final String TEST_LA_SHORT_CODE = "man";
 
   @Mock private SecurityContext mockSecurityContext;
 
-  @Mock private Authentication mockAuthentication;
+  private OAuth2Request request =
+      new OAuth2Request(
+          null, "id", null, false, Collections.singleton("read"), null, null, null, null);
+
+  private UsernamePasswordAuthenticationToken userAuthentication =
+      new UsernamePasswordAuthenticationToken(
+          DEFAULT_EMAIL_ADDRESS,
+          "bar",
+          Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
 
   private SecurityUtils securityUtils;
+  private OAuth2Authentication auth2Authentication;
 
   @Before
   public void setUp() {
     initMocks(this);
     securityUtils = new SecurityUtils();
     SecurityContextHolder.setContext(mockSecurityContext);
+    auth2Authentication = new OAuth2Authentication(request, userAuthentication);
+    HttpServletRequest mockHttpRequest = mock(HttpServletRequest.class);
+    OAuth2AuthenticationDetails details = new OAuth2AuthenticationDetails(mockHttpRequest);
+    details.setDecodedDetails(ImmutableMap.of("local-authority", TEST_LA_SHORT_CODE));
+    auth2Authentication.setDetails(details);
   }
 
   @Test
   public void shouldReturnAValidUser() {
 
     // given
-    when(mockAuthentication.getName()).thenReturn(DEFAULT_EMAIL_ADDRESS);
-    when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
 
     // when
     User currentUserDetails = securityUtils.getCurrentUserDetails();
 
     // then
-    assertThat(currentUserDetails.getEmailAddress(), is(DEFAULT_EMAIL_ADDRESS));
+    assertThat(currentUserDetails.getEmailAddress()).isEqualTo(DEFAULT_EMAIL_ADDRESS);
+    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_USER");
+    assertThat(currentUserDetails.getLocalAuthorityShortCode()).isEqualTo(TEST_LA_SHORT_CODE);
   }
 
   @Test
   public void shouldReturnAValidLocalAuthority() {
     // given
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
 
     // when
-    LocalAuthority currentLocalAuthority = securityUtils.getCurrentLocalAuthority();
+    String currentLocalAuthority = securityUtils.getCurrentLocalAuthorityShortCode();
 
     // then
-    assertThat(currentLocalAuthority.getId(), is(MOCK_LOCAL_AUTHORITY_ID));
+    assertThat(currentLocalAuthority).isEqualTo(TEST_LA_SHORT_CODE);
   }
 }
