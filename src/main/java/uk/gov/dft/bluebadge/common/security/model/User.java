@@ -9,10 +9,7 @@ import lombok.ToString;
 @Builder
 @ToString
 public class User {
-  private Integer id;
-  private String name;
-  private String emailAddress;
-  private LocalAuthority localAuthority;
-  private Integer roleId;
-  private String roleName;
+  private final String emailAddress;
+  private final String localAuthorityShortCode;
+  private final String roleName;
 }
