@@ -1,14 +1,16 @@
 package uk.gov.dft.bluebadge.common.security;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-
 import uk.gov.dft.bluebadge.common.security.model.User;
 
+@Slf4j
 public class SecurityUtils {
   public static final String LOCAL_AUTHORITY_KEY = "local-authority";
 
@@ -21,16 +23,18 @@ public class SecurityUtils {
 
     OAuth2Authentication authentication = getCurrentAuthenticationContext();
 
+    Map<String, String> additionalInfo;
     if (authentication.getDetails() == null) {
       throw new NullPointerException("Authentication details is null.");
-    } else if (!(authentication.getDetails() instanceof OAuth2AuthenticationDetails)) {
-      throw new IllegalStateException(
-          "Authentication details of unsupported type: " + authentication.getDetails().getClass());
+    } else if ((authentication.getDetails() instanceof OAuth2AuthenticationDetails)) {
+      OAuth2AuthenticationDetails oauthDetails =
+          (OAuth2AuthenticationDetails) authentication.getDetails();
+      additionalInfo = (Map<String, String>) oauthDetails.getDecodedDetails();
+    } else {
+      // Backward compatible to allow older services to use the latest security utils.
+      log.warn("Old security authentication being used. Using hard coded local authority!");
+      additionalInfo = ImmutableMap.of(LOCAL_AUTHORITY_KEY, "ABERD");
     }
-
-    OAuth2AuthenticationDetails oauthDetails =
-        (OAuth2AuthenticationDetails) authentication.getDetails();
-    Map<String, String> additionalInfo = (Map<String, String>) oauthDetails.getDecodedDetails();
 
     String roleName =
         authentication
