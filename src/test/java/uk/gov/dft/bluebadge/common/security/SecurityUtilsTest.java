@@ -89,6 +89,7 @@ public class SecurityUtilsTest {
   public void whenAuthenticationNull_thenException() {
     securityUtils.getCurrentUserDetails();
   }
+
   @Test(expected = IllegalStateException.class)
   public void whenNotOAuthAuthentication_thenException() {
     // given
@@ -97,6 +98,7 @@ public class SecurityUtilsTest {
     // when
     securityUtils.getCurrentUserDetails();
   }
+
   @Test(expected = NullPointerException.class)
   public void whenAuthenticationDetailsNull_thenException() {
     // given
@@ -105,13 +107,15 @@ public class SecurityUtilsTest {
     // when
     securityUtils.getCurrentUserDetails();
   }
-  @Test(expected = IllegalStateException.class)
-  public void whenAuthenticationDetailsNotAsExpected_thenException() {
+
+  @Test
+  public void whenAuthenticationDetailsNotAsExpected_thenException_todoLocalAuthIsAberd() {
     // given
     auth2Authentication.setDetails(new ArrayList<>());
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
 
     // when
-    securityUtils.getCurrentUserDetails();
+    User currentUserDetails = securityUtils.getCurrentUserDetails();
+    assertThat(currentUserDetails.getLocalAuthorityShortCode()).isEqualTo("ABERD");
   }
 }
