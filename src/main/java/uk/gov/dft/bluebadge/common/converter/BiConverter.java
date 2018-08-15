@@ -6,4 +6,4 @@ package uk.gov.dft.bluebadge.common.converter;
  * @param <E> DB Entity bean
  * @param <M> API Model bean
  */
-interface BiConverter<E, M> extends ToModelConverter<E, M>, ToEntityConverter<E, M> {}
+public interface BiConverter<E, M> extends ToModelConverter<E, M>, ToEntityConverter<E, M> {}
