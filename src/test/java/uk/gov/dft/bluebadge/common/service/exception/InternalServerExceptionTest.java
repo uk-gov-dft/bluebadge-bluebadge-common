@@ -13,8 +13,7 @@ public class InternalServerExceptionTest {
   public void testResponse() {
     Error error = new Error();
     error.setMessage("ABC");
-    InternalServerException exception =
-        new InternalServerException(error);
+    InternalServerException exception = new InternalServerException(error);
     ResponseEntity<CommonResponse> response = exception.getResponse();
 
     Assert.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());

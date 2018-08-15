@@ -11,4 +11,3 @@ public class InternalServerException extends ServiceException {
     commonResponse.setError(error);
   }
 }
-

@@ -28,7 +28,7 @@ public abstract class AbstractController {
     return e1.getResponse();
   }
 
-  static String parseInvalidFormatReason(String reason){
+  static String parseInvalidFormatReason(String reason) {
     // The error for an invalid enum has class inside backticks.
     // Possibly construed to be a security risk.
     // Of no use to consumer of API anyway, so remove.
