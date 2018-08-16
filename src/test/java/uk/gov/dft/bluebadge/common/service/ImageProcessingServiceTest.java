@@ -1,7 +1,5 @@
 package uk.gov.dft.bluebadge.common.service;
 
-import static org.junit.Assert.*;
-
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import org.junit.Assert;
@@ -13,29 +11,6 @@ public class ImageProcessingServiceTest {
 
   private final String BADGE_NUMBER = "KKKKKK";
 
-  private final String IMAGE_JPG_BASE64_GOOD =
-      "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRo"
-          + "fHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjI"
-          + "yMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwI"
-          + "EAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmN"
-          + "kZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb"
-          + "3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobH"
-          + "BCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqO"
-          + "kpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDLs2+z3C3AbAXgqO4NWtN02TU"
-          + "b9JlXFvHIWJPc5NP0rSzdv5sgxEnXPeuysreJIlESYQ9MCtIVnTVkeTgcO2ryQ+OEemM9cUVcERJBJKgdqK53q7nrrQ//2Q==";
-  private final String IMAGE_PNG_BASE64_GOOD =
-      "iVBORw0KGgoAAAANSUhEUgAAABgAAAAQCAYAAAAMJL+VAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAD"
-          + "aklEQVQ4jT2Uy3JkRQxEjx5VdV9tt+1p20NAEDCw4h/4DD6Jv2RJBBHAMIwf3X1vVYlFm9lLmSllSjL8+kuMJZEssz2fyDHww8OPfH/4gL8W/vn9"
-          + "M7//9gdLuUJIrK3y519/cZUrP//0yIeHHUNOnF6fcAt2cyFnMA3Or0d8LhkRgR6gwvH1xMdPn3jcb+xspquhPpDKTG9CbCDi5OQs48IwDIwl4xqY"
-          + "VdyF3jeiN0op6JInEo4GZDXaVnl6euL1+YnaVpQgJUMkWE9HzsdnTIS76yuWeWTIBXcnF6d4QhGidVprqILrqWE9AFAraBEGM2I70zji1igeSH1l"
-          + "fflEPZ3YDQMPdwsWnbadkVCIjmXDFNwS5gVaxbVCQlFVXJ15KZSeOb88s5VCVEHjCM1IcmKcjaurwv3NTMkCBL02TBsqgoggqqSUsOR46gk0UMBC"
-          + "mccRq87Lv/8wDoYdhfXlM0ueOOwHDnc3zPPE/c3ILguDNugbomBm9DjTe6U10JTwLRqCUcwwc6Zpwqrx8e8nXp4/osfg/PrETRIeb97x4Zt7Sk7c"
-          + "zBlvR1w7XTqmgbvRukE3VJ3j8Yyvc4beed1Wcq3UT0FqgHW27QXWlet94f1h5LuHPXcFxiTkdiQ4IdJIppgqvZ1REbyMiARDmfETGyoKArU2Tu1E"
-          + "78LQg2mc2JWR27Rwv1/YDU6RjdwFo6OpIw7uFw8jhIhLYEARMTx6R4FkitZKX1eyJJZS2I8T76drHpdb9qkwaiap4nIxNyJQkTfwoNZGrfULyTQt"
-          + "uHVIIhQxVIKkwnWeeJx33JUdh901h3mhhFLaRYgLIEqHy5ECvXdqrWzbdiFWBcAzirXAo5N7MKlzO4wc5oXH+YbbYWRQxWpHCVQdM4gIzBLihoig"
-          + "KrhfknSpsUv0vYNuDYvGLJm7YeR+nLlJI++mmVEUbx2NhouiVDoBAiGK9A5vk6SUMDPcM2bGtm14buA9mHDezTu+3t/y1bxnZwlfK7RGRJCSk1wI"
-          + "Gq13zAwRo78RXNRegAHaW5+X1ilh7Nw5zAvf3h64n64otfP5jz+J1rCS8OSYCL13QgURI6VE753+Rvj/Wlq7mA3gC871OPGwu+L91S1TGP3pyHpe"
-          + "6acVqRVVY/BEGQbWtoII4zhRu+CevxgdEZcnJ07JiVor/wFTTXuxHEJ3MgAAAABJRU5ErkJggg==";
   private final String IMAGE_GIF_BASE64 =
       "R0lGODlhOAHwAPAAAAAAAP///ywAAAAAOAHwAAAC/kSMp8nrDZ+MdNqKr858+w5+YkiOZhOk6sq2"
           + "7gvH8kzX9o3n+s73/j8rCU/EobGIPCqTzKXTBIxKp9Sq9YrN4p7cprcL/orD5LFGi06r1+y2e1WOm+X0ub2OF733/L7/v5YneEc4aFiIOAS4yNjo"
@@ -68,12 +43,35 @@ public class ImageProcessingServiceTest {
 
   @Test
   public void readJpgGood() {
+    String IMAGE_JPG_BASE64_GOOD =
+        "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRo"
+            + "fHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjI"
+            + "yMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwI"
+            + "EAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmN"
+            + "kZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb"
+            + "3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobH"
+            + "BCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqO"
+            + "kpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDLs2+z3C3AbAXgqO4NWtN02TU"
+            + "b9JlXFvHIWJPc5NP0rSzdv5sgxEnXPeuysreJIlESYQ9MCtIVnTVkeTgcO2ryQ+OEemM9cUVcERJBJKgdqK53q7nrrQ//2Q==";
     BufferedImage image = service.getBufferedImageFromBase64(IMAGE_JPG_BASE64_GOOD, BADGE_NUMBER);
     Assert.assertNotNull(image);
   }
 
   @Test
   public void readPngGood() {
+    String IMAGE_PNG_BASE64_GOOD =
+        "iVBORw0KGgoAAAANSUhEUgAAABgAAAAQCAYAAAAMJL+VAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAD"
+            + "aklEQVQ4jT2Uy3JkRQxEjx5VdV9tt+1p20NAEDCw4h/4DD6Jv2RJBBHAMIwf3X1vVYlFm9lLmSllSjL8+kuMJZEssz2fyDHww8OPfH/4gL8W/vn9"
+            + "M7//9gdLuUJIrK3y519/cZUrP//0yIeHHUNOnF6fcAt2cyFnMA3Or0d8LhkRgR6gwvH1xMdPn3jcb+xspquhPpDKTG9CbCDi5OQs48IwDIwl4xqY"
+            + "VdyF3jeiN0op6JInEo4GZDXaVnl6euL1+YnaVpQgJUMkWE9HzsdnTIS76yuWeWTIBXcnF6d4QhGidVprqILrqWE9AFAraBEGM2I70zji1igeSH1l"
+            + "fflEPZ3YDQMPdwsWnbadkVCIjmXDFNwS5gVaxbVCQlFVXJ15KZSeOb88s5VCVEHjCM1IcmKcjaurwv3NTMkCBL02TBsqgoggqqSUsOR46gk0UMBC"
+            + "mccRq87Lv/8wDoYdhfXlM0ueOOwHDnc3zPPE/c3ILguDNugbomBm9DjTe6U10JTwLRqCUcwwc6Zpwqrx8e8nXp4/osfg/PrETRIeb97x4Zt7Sk7c"
+            + "zBlvR1w7XTqmgbvRukE3VJ3j8Yyvc4beed1Wcq3UT0FqgHW27QXWlet94f1h5LuHPXcFxiTkdiQ4IdJIppgqvZ1REbyMiARDmfETGyoKArU2Tu1E"
+            + "78LQg2mc2JWR27Rwv1/YDU6RjdwFo6OpIw7uFw8jhIhLYEARMTx6R4FkitZKX1eyJJZS2I8T76drHpdb9qkwaiap4nIxNyJQkTfwoNZGrfULyTQt"
+            + "uHVIIhQxVIKkwnWeeJx33JUdh901h3mhhFLaRYgLIEqHy5ECvXdqrWzbdiFWBcAzirXAo5N7MKlzO4wc5oXH+YbbYWRQxWpHCVQdM4gIzBLihoig"
+            + "KrhfknSpsUv0vYNuDYvGLJm7YeR+nLlJI++mmVEUbx2NhouiVDoBAiGK9A5vk6SUMDPcM2bGtm14buA9mHDezTu+3t/y1bxnZwlfK7RGRJCSk1wI"
+            + "Gq13zAwRo78RXNRegAHaW5+X1ilh7Nw5zAvf3h64n64otfP5jz+J1rCS8OSYCL13QgURI6VE753+Rvj/Wlq7mA3gC871OPGwu+L91S1TGP3pyHpe"
+            + "6acVqRVVY/BEGQbWtoII4zhRu+CevxgdEZcnJ07JiVor/wFTTXuxHEJ3MgAAAABJRU5ErkJggg==";
     BufferedImage image = service.getBufferedImageFromBase64(IMAGE_PNG_BASE64_GOOD, BADGE_NUMBER);
     Assert.assertNotNull(image);
   }
