@@ -20,4 +20,13 @@ public class InternalServerExceptionTest {
     //noinspection ConstantConditions
     Assert.assertEquals("ABC", response.getBody().getError().getMessage());
   }
+
+  @Test
+  public void testResponseWhenConstructedWithException() {
+    InternalServerException exception = new InternalServerException(new NullPointerException());
+
+    ResponseEntity<CommonResponse> response = exception.getResponse();
+
+    Assert.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+  }
 }
