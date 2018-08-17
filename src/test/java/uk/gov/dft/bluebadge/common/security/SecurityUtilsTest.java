@@ -52,8 +52,31 @@ public class SecurityUtilsTest {
   private void setupAuthenticationDetails() {
     HttpServletRequest mockHttpRequest = mock(HttpServletRequest.class);
     OAuth2AuthenticationDetails details = new OAuth2AuthenticationDetails(mockHttpRequest);
-    details.setDecodedDetails(ImmutableMap.of("local-authority", TEST_LA_SHORT_CODE));
+    ImmutableMap<String, String> claims =
+        ImmutableMap.<String, String>builder()
+            .put("local-authority", TEST_LA_SHORT_CODE)
+            .put("client_id", "fakeClient")
+            .put("user_name", DEFAULT_EMAIL_ADDRESS)
+            .build();
+    details.setDecodedDetails(claims);
     auth2Authentication.setDetails(details);
+  }
+
+  @Test
+  public void shouldReturnAValidPrincipal() {
+
+    // given
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    setupAuthenticationDetails();
+
+    // when
+    BBPrincipal currentUserDetails = securityUtils.getCurrentAuth();
+
+    // then
+    assertThat(currentUserDetails.getEmailAddress()).isEqualTo(DEFAULT_EMAIL_ADDRESS);
+    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_USER");
+    assertThat(currentUserDetails.getLocalAuthorityShortCode()).isEqualTo(TEST_LA_SHORT_CODE);
+    assertThat(currentUserDetails.getClientId()).isEqualTo("fakeClient");
   }
 
   @Test

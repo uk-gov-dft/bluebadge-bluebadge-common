@@ -126,6 +126,22 @@ artifactory {
 bootJar.enabled = false
 jar.enabled = true
 
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+task testsJar(type: Jar, dependsOn: testClasses) {
+    classifier = 'tests'
+    from sourceSets.test.output.classesDir
+}
+
 archivesBaseName = "bluebadge-common"
 
 publishing {
@@ -133,6 +149,9 @@ publishing {
         project_common(MavenPublication) {
             from components.java
             artifactId "${archivesBaseName}"
+            artifact sourcesJar
+            artifact javadocJar
+            artifact testsJar
         }
     }
 }
