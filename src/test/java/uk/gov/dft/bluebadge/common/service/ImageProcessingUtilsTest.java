@@ -3,11 +3,10 @@ package uk.gov.dft.bluebadge.common.service;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import uk.gov.dft.bluebadge.common.service.exception.BadRequestException;
 
-public class ImageProcessingServiceTest {
+public class ImageProcessingUtilsTest {
 
   private final String BADGE_NUMBER = "KKKKKK";
 
@@ -25,20 +24,13 @@ public class ImageProcessingServiceTest {
           + "v0wLUrSvYpuRtrdxi5G3pYJ7kbirkTuTteoyha5O675LSrsOmfupvO7Se5m9BuHrqL4F8Zuvv0HBSzBBAvMDMKIHI1xww8osTE/CkEEcscMWN0Qx"
           + "OxLfmbHGF3+cZsfibJyYyOqQ3KbJI4PM8pwqY1MAADs=";
 
-  private ImageProcessingService service;
-
-  @Before
-  public void setUp() {
-    service = new ImageProcessingService();
-  }
-
   @Test
   public void getProportionalWidth() {
     // If height unchanged then width unchanged
-    Assert.assertEquals(100, service.getProportionalWidth(300, 100, 300));
+    Assert.assertEquals(100, ImageProcessingUtils.getProportionalWidth(300, 100, 300));
 
     // Target height 50%
-    Assert.assertEquals(50, service.getProportionalWidth(300, 100, 150));
+    Assert.assertEquals(50, ImageProcessingUtils.getProportionalWidth(300, 100, 150));
   }
 
   @Test
@@ -53,7 +45,8 @@ public class ImageProcessingServiceTest {
             + "BCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqO"
             + "kpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDLs2+z3C3AbAXgqO4NWtN02TU"
             + "b9JlXFvHIWJPc5NP0rSzdv5sgxEnXPeuysreJIlESYQ9MCtIVnTVkeTgcO2ryQ+OEemM9cUVcERJBJKgdqK53q7nrrQ//2Q==";
-    BufferedImage image = service.getBufferedImageFromBase64(IMAGE_JPG_BASE64_GOOD, BADGE_NUMBER);
+    BufferedImage image =
+        ImageProcessingUtils.getBufferedImageFromBase64(IMAGE_JPG_BASE64_GOOD, BADGE_NUMBER);
     Assert.assertNotNull(image);
   }
 
@@ -72,13 +65,15 @@ public class ImageProcessingServiceTest {
             + "KrhfknSpsUv0vYNuDYvGLJm7YeR+nLlJI++mmVEUbx2NhouiVDoBAiGK9A5vk6SUMDPcM2bGtm14buA9mHDezTu+3t/y1bxnZwlfK7RGRJCSk1wI"
             + "Gq13zAwRo78RXNRegAHaW5+X1ilh7Nw5zAvf3h64n64otfP5jz+J1rCS8OSYCL13QgURI6VE753+Rvj/Wlq7mA3gC871OPGwu+L91S1TGP3pyHpe"
             + "6acVqRVVY/BEGQbWtoII4zhRu+CevxgdEZcnJ07JiVor/wFTTXuxHEJ3MgAAAABJRU5ErkJggg==";
-    BufferedImage image = service.getBufferedImageFromBase64(IMAGE_PNG_BASE64_GOOD, BADGE_NUMBER);
+    BufferedImage image =
+        ImageProcessingUtils.getBufferedImageFromBase64(IMAGE_PNG_BASE64_GOOD, BADGE_NUMBER);
     Assert.assertNotNull(image);
   }
 
   @Test
   public void readGifGood() {
-    BufferedImage image = service.getBufferedImageFromBase64(IMAGE_GIF_BASE64, BADGE_NUMBER);
+    BufferedImage image =
+        ImageProcessingUtils.getBufferedImageFromBase64(IMAGE_GIF_BASE64, BADGE_NUMBER);
     Assert.assertNotNull(image);
   }
 
@@ -86,24 +81,25 @@ public class ImageProcessingServiceTest {
   public void readCorruptImage() {
     // Following is just some text encoded
     String IMAGE_CORRUPT = "QSBiaXQgb2YgdGV4dC4=";
-    service.getBufferedImageFromBase64(IMAGE_CORRUPT, BADGE_NUMBER);
+    ImageProcessingUtils.getBufferedImageFromBase64(IMAGE_CORRUPT, BADGE_NUMBER);
     Assert.fail();
   }
 
   @Test(expected = BadRequestException.class)
   public void readInvalidBase64() {
     String input = "||___££$$";
-    service.getBufferedImageFromBase64(input, BADGE_NUMBER);
+    ImageProcessingUtils.getBufferedImageFromBase64(input, BADGE_NUMBER);
     Assert.fail();
   }
 
   @Test
   public void getInputStreamForSizedBufferedImage() {
     // Given a valid buffered image
-    BufferedImage image = service.getBufferedImageFromBase64(IMAGE_GIF_BASE64, BADGE_NUMBER);
+    BufferedImage image =
+        ImageProcessingUtils.getBufferedImageFromBase64(IMAGE_GIF_BASE64, BADGE_NUMBER);
 
     // When request an input stream for the image sized
-    InputStream result = service.getInputStreamForSizedBufferedImage(image, 300);
+    InputStream result = ImageProcessingUtils.getInputStreamForSizedBufferedImage(image, 300);
 
     // Then no exceptions
     Assert.assertNotNull(result);
