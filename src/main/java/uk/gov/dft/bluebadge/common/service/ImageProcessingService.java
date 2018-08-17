@@ -1,12 +1,5 @@
 package uk.gov.dft.bluebadge.common.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import uk.gov.dft.bluebadge.common.api.model.Error;
-import uk.gov.dft.bluebadge.common.service.exception.BadRequestException;
-import uk.gov.dft.bluebadge.common.service.exception.InternalServerException;
-
-import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -15,6 +8,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
+import javax.imageio.ImageIO;
+import lombok.extern.slf4j.Slf4j;
+
+import uk.gov.dft.bluebadge.common.api.model.Error;
+import uk.gov.dft.bluebadge.common.service.exception.BadRequestException;
+import uk.gov.dft.bluebadge.common.service.exception.InternalServerException;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 @Slf4j
