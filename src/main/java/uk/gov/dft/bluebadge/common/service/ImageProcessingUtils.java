@@ -20,6 +20,8 @@ import uk.gov.dft.bluebadge.common.service.exception.InternalServerException;
 @Slf4j
 public class ImageProcessingUtils {
 
+    private ImageProcessingUtils() {}
+
     public static final String JPG_FORMAT = "JPG";
 
     /**
