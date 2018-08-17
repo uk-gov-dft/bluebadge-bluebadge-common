@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.util.Base64;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-@Service
 @Slf4j
 public class ImageProcessingService {
   /**
