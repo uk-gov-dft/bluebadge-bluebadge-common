@@ -1,4 +1,4 @@
-package uk.gov.dft.bluebadge.common.security;
+package uk.gov.dft.bluebadge.common.security.model;
 
 import lombok.Builder;
 import lombok.Data;
