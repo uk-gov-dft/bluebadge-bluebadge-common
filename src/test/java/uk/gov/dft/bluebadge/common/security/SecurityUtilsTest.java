@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import uk.gov.dft.bluebadge.common.security.model.BBPrincipal;
 import uk.gov.dft.bluebadge.common.security.model.User;
 
 public class SecurityUtilsTest {

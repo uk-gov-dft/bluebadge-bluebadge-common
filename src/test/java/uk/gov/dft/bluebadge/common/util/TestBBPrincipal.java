@@ -1,6 +1,6 @@
 package uk.gov.dft.bluebadge.common.util;
 
-import uk.gov.dft.bluebadge.common.security.BBPrincipal;
+import uk.gov.dft.bluebadge.common.security.model.BBPrincipal;
 
 public class TestBBPrincipal {
   public static BBPrincipal.BBPrincipalBuilder clientCreds() {
