@@ -13,14 +13,25 @@ import uk.gov.dft.bluebadge.common.security.model.User;
 @Slf4j
 public class SecurityUtils {
   public static final String LOCAL_AUTHORITY_KEY = "local-authority";
+  public static final String USER_NAME_KEY = "user_name";
+  public static final String CLIENT_ID_KEY = "client_id";
 
   /**
-   * Returns the currently logged in user.
-   *
-   * @return
+   * @return The user extracted from security context and JWT claims
+   * @deprecated use getCurrentAuth instead
    */
+  @Deprecated
   public User getCurrentUserDetails() {
+    BBPrincipal currentAuth = getCurrentAuth();
 
+    return User.builder()
+        .emailAddress(currentAuth.getEmailAddress())
+        .roleName(currentAuth.getRoleName())
+        .localAuthorityShortCode(currentAuth.getLocalAuthorityShortCode())
+        .build();
+  }
+
+  public BBPrincipal getCurrentAuth() {
     OAuth2Authentication authentication = getCurrentAuthenticationContext();
 
     Map<String, String> additionalInfo;
@@ -30,10 +41,12 @@ public class SecurityUtils {
       OAuth2AuthenticationDetails oauthDetails =
           (OAuth2AuthenticationDetails) authentication.getDetails();
       additionalInfo = (Map<String, String>) oauthDetails.getDecodedDetails();
+    } else if ((authentication.getDetails() instanceof Map)) {
+      additionalInfo = ImmutableMap.copyOf((Map) authentication.getDetails());
     } else {
       // Backward compatible to allow older services to use the latest security utils.
       log.warn("Old security authentication being used. Using hard coded local authority!");
-      additionalInfo = ImmutableMap.of(LOCAL_AUTHORITY_KEY, "ABERD");
+      additionalInfo = ImmutableMap.of(LOCAL_AUTHORITY_KEY, "ABERD", CLIENT_ID_KEY, "unknown");
     }
 
     String roleName =
@@ -44,24 +57,17 @@ public class SecurityUtils {
             .map(GrantedAuthority::getAuthority)
             .orElseThrow(() -> new NullPointerException("Authentication has no authorities."));
 
-    return User.builder()
-        .emailAddress(authentication.getName())
+    return BBPrincipal.builder()
+        .clientId(additionalInfo.get(CLIENT_ID_KEY))
+        .emailAddress(additionalInfo.get(USER_NAME_KEY))
         .roleName(roleName)
-        .localAuthorityShortCode(extractLocalAuthorityShortCode(additionalInfo))
+        .localAuthorityShortCode(additionalInfo.get(LOCAL_AUTHORITY_KEY))
         .build();
   }
 
-  /**
-   * Returns the LocalAuthority as provided in the security credentials.
-   *
-   * @return
-   */
+  /** @return The LocalAuthority as provided in the security credentials. */
   public String getCurrentLocalAuthorityShortCode() {
-    return getCurrentUserDetails().getLocalAuthorityShortCode();
-  }
-
-  private String extractLocalAuthorityShortCode(Map<String, String> additionalInfo) {
-    return additionalInfo.get(LOCAL_AUTHORITY_KEY);
+    return getCurrentAuth().getLocalAuthorityShortCode();
   }
 
   /**
