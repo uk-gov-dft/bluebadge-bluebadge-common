@@ -91,11 +91,14 @@ public class SecurityUtils {
   }
 
   public boolean isAuthorisedLA(LocalAuthorityControlled localAuthorityControlled) {
+    return isAuthorisedLA(localAuthorityControlled.getLocalAuthorityShortCode());
+  }
+
+  public boolean isAuthorisedLA(String localAuthority) {
     String currentLocalAuthorityShortCode = getCurrentLocalAuthorityShortCode();
     if (null == currentLocalAuthorityShortCode) {
       throw new NullPointerException("Principal's local authority is null");
     }
-    return currentLocalAuthorityShortCode.equals(
-        localAuthorityControlled.getLocalAuthorityShortCode());
+    return currentLocalAuthorityShortCode.equals(localAuthority);
   }
 }

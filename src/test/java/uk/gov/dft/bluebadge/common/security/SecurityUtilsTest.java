@@ -165,29 +165,31 @@ public class SecurityUtilsTest {
   }
 
   @Test
-  public void whenSameLA_thenAuthorised(){
+  public void whenSameLA_thenAuthorised() {
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
     setupAuthenticationDetails();
 
-    TestLAControlled laControlled = TestLAControlled.builder().localAuthorityShortCode(TEST_LA_SHORT_CODE).build();
+    TestLAControlled laControlled =
+        TestLAControlled.builder().localAuthorityShortCode(TEST_LA_SHORT_CODE).build();
     boolean result = securityUtils.isAuthorisedLA(laControlled);
 
     assertThat(result).isTrue();
   }
 
   @Test
-  public void whenDifferentLA_thenNotAuthorised(){
+  public void whenDifferentLA_thenNotAuthorised() {
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
     setupAuthenticationDetails();
 
-    TestLAControlled laControlled = TestLAControlled.builder().localAuthorityShortCode("ABERD").build();
+    TestLAControlled laControlled =
+        TestLAControlled.builder().localAuthorityShortCode("ABERD").build();
     boolean result = securityUtils.isAuthorisedLA(laControlled);
 
     assertThat(result).isFalse();
   }
 
   @Test
-  public void whenControlledLAIsNull_thenNotAuthorised(){
+  public void whenControlledLAIsNull_thenNotAuthorised() {
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
     setupAuthenticationDetails();
 
@@ -198,19 +200,19 @@ public class SecurityUtilsTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void whenNullLA_thenException(){
+  public void whenNullLA_thenException() {
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
-    claims =
-        ImmutableMap.<String, String>builder()
-            .build();
+    claims = ImmutableMap.<String, String>builder().build();
     setupAuthenticationDetails();
 
-    TestLAControlled laControlled = TestLAControlled.builder().localAuthorityShortCode("ABERD").build();
+    TestLAControlled laControlled =
+        TestLAControlled.builder().localAuthorityShortCode("ABERD").build();
     securityUtils.isAuthorisedLA(laControlled);
   }
 
-  @Builder @Getter
-  private static class TestLAControlled implements LocalAuthorityControlled{
+  @Builder
+  @Getter
+  private static class TestLAControlled implements LocalAuthorityControlled {
     private String localAuthorityShortCode;
   }
 }
