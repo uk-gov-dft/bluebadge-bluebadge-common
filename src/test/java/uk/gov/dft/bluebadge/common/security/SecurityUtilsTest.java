@@ -9,6 +9,8 @@ import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
+import lombok.Builder;
+import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -20,6 +22,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import uk.gov.dft.bluebadge.common.security.model.BBPrincipal;
+import uk.gov.dft.bluebadge.common.security.model.LocalAuthorityControlled;
 import uk.gov.dft.bluebadge.common.security.model.User;
 
 public class SecurityUtilsTest {
@@ -49,11 +52,12 @@ public class SecurityUtilsTest {
     securityUtils = new SecurityUtils();
     SecurityContextHolder.setContext(mockSecurityContext);
     auth2Authentication = new OAuth2Authentication(request, userAuthentication);
-    claims = ImmutableMap.<String, String>builder()
-        .put("local-authority", TEST_LA_SHORT_CODE)
-        .put("client_id", "fakeClient")
-        .put("user_name", DEFAULT_EMAIL_ADDRESS)
-        .build();
+    claims =
+        ImmutableMap.<String, String>builder()
+            .put("local-authority", TEST_LA_SHORT_CODE)
+            .put("client_id", "fakeClient")
+            .put("user_name", DEFAULT_EMAIL_ADDRESS)
+            .build();
   }
 
   private void setupAuthenticationDetails() {
@@ -158,5 +162,55 @@ public class SecurityUtilsTest {
     // when
     User currentUserDetails = securityUtils.getCurrentUserDetails();
     assertThat(currentUserDetails.getLocalAuthorityShortCode()).isEqualTo("ABERD");
+  }
+
+  @Test
+  public void whenSameLA_thenAuthorised(){
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    setupAuthenticationDetails();
+
+    TestLAControlled laControlled = TestLAControlled.builder().localAuthorityShortCode(TEST_LA_SHORT_CODE).build();
+    boolean result = securityUtils.isAuthorisedLA(laControlled);
+
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  public void whenDifferentLA_thenNotAuthorised(){
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    setupAuthenticationDetails();
+
+    TestLAControlled laControlled = TestLAControlled.builder().localAuthorityShortCode("ABERD").build();
+    boolean result = securityUtils.isAuthorisedLA(laControlled);
+
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void whenControlledLAIsNull_thenNotAuthorised(){
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    setupAuthenticationDetails();
+
+    TestLAControlled laControlled = TestLAControlled.builder().build();
+    boolean result = securityUtils.isAuthorisedLA(laControlled);
+
+    assertThat(result).isFalse();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void whenNullLA_thenException(){
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    claims =
+        ImmutableMap.<String, String>builder()
+            .build();
+    setupAuthenticationDetails();
+
+    TestLAControlled laControlled = TestLAControlled.builder().localAuthorityShortCode("ABERD").build();
+    securityUtils.isAuthorisedLA(laControlled);
+  }
+
+  @Builder @Getter
+  private static class TestLAControlled implements LocalAuthorityControlled{
+    private String localAuthorityShortCode;
   }
 }

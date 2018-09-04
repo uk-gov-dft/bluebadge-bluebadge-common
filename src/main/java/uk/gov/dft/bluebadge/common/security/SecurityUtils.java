@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import uk.gov.dft.bluebadge.common.security.model.BBPrincipal;
+import uk.gov.dft.bluebadge.common.security.model.LocalAuthorityControlled;
 import uk.gov.dft.bluebadge.common.security.model.User;
 
 @Slf4j
@@ -87,5 +88,14 @@ public class SecurityUtils {
           "Authentication of unsupported type: " + authentication.getClass());
     }
     return (OAuth2Authentication) authentication;
+  }
+
+  public boolean isAuthorisedLA(LocalAuthorityControlled localAuthorityControlled) {
+    String currentLocalAuthorityShortCode = getCurrentLocalAuthorityShortCode();
+    if (null == currentLocalAuthorityShortCode) {
+      throw new NullPointerException("Principal's local authority is null");
+    }
+    return currentLocalAuthorityShortCode.equals(
+        localAuthorityControlled.getLocalAuthorityShortCode());
   }
 }
