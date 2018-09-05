@@ -23,4 +23,11 @@ public enum Permissions {
   FIND_APPLICATION,
   VIEW_APPLICATION_DETAILS,
   DELETE_APPLICATION
+  ;
+
+  public static final String PERMISSION_PREFIX = "PERM_";
+
+  public String getPermissionName(){
+    return PERMISSION_PREFIX + name();
+  }
 }
