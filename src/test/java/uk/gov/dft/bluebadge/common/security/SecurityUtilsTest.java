@@ -216,14 +216,18 @@ public class SecurityUtilsTest {
   }
 
   @Test
-  public void isPermitted_shouldReturnTrue_WhenAccessDecisionManagerDoesNotThrowInsufficientAuthenticationExceptionn() {
+  public void
+      isPermitted_shouldReturnTrue_WhenAccessDecisionManagerDoesNotThrowInsufficientAuthenticationExceptionn() {
     boolean result = securityUtils.isPermitted(Permissions.FIND_BADGES);
     assertThat(result).isTrue();
   }
 
   @Test
-  public void isPermitted_shouldReturnFalse_WhenAccessDecisionManagerThrowsInsufficientAuthenticationException() {
-    doThrow(InsufficientAuthenticationException.class).when(mockAccessDecisionManager).decide(any(), any(), any());
+  public void
+      isPermitted_shouldReturnFalse_WhenAccessDecisionManagerThrowsInsufficientAuthenticationException() {
+    doThrow(InsufficientAuthenticationException.class)
+        .when(mockAccessDecisionManager)
+        .decide(any(), any(), any());
     boolean result = securityUtils.isPermitted(Permissions.FIND_BADGES);
     assertThat(result).isFalse();
   }

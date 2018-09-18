@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
@@ -121,7 +122,7 @@ public class SecurityUtils {
           authentication,
           null,
           Collections.singletonList(new SecurityConfig(permission.getPermissionName())));
-    } catch (InsufficientAuthenticationException e) {
+    } catch (InsufficientAuthenticationException | AccessDeniedException e) {
       return false;
     }
     return true;
