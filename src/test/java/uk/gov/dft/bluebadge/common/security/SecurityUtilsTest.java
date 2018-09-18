@@ -1,13 +1,12 @@
 package uk.gov.dft.bluebadge.common.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
@@ -16,8 +15,6 @@ import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.springframework.security.access.AccessDecisionManager;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -35,7 +32,6 @@ public class SecurityUtilsTest {
   private static final String TEST_LA_SHORT_CODE = "man";
 
   @Mock private SecurityContext mockSecurityContext;
-  @Mock private AccessDecisionManager mockAccessDecisionManager;
 
   private OAuth2Request request =
       new OAuth2Request(
@@ -45,7 +41,9 @@ public class SecurityUtilsTest {
       new UsernamePasswordAuthenticationToken(
           DEFAULT_EMAIL_ADDRESS,
           "bar",
-          Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+          ImmutableSet.of(
+              new SimpleGrantedAuthority("ROLE_USER"),
+              new SimpleGrantedAuthority("PERM_FIND_USERS")));
 
   private SecurityUtils securityUtils;
   private OAuth2Authentication auth2Authentication;
@@ -54,7 +52,7 @@ public class SecurityUtilsTest {
   @Before
   public void setUp() {
     initMocks(this);
-    securityUtils = new SecurityUtils(mockAccessDecisionManager);
+    securityUtils = new SecurityUtils();
     SecurityContextHolder.setContext(mockSecurityContext);
     auth2Authentication = new OAuth2Authentication(request, userAuthentication);
     claims =
@@ -216,18 +214,15 @@ public class SecurityUtilsTest {
   }
 
   @Test
-  public void
-      isPermitted_shouldReturnTrue_WhenAccessDecisionManagerDoesNotThrowInsufficientAuthenticationExceptionn() {
-    boolean result = securityUtils.isPermitted(Permissions.FIND_BADGES);
+  public void isPermitted_shouldReturnTrue_WhenPermissionIsInUserAuthorities() {
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    boolean result = securityUtils.isPermitted(Permissions.FIND_USERS);
     assertThat(result).isTrue();
   }
 
   @Test
-  public void
-      isPermitted_shouldReturnFalse_WhenAccessDecisionManagerThrowsInsufficientAuthenticationException() {
-    doThrow(InsufficientAuthenticationException.class)
-        .when(mockAccessDecisionManager)
-        .decide(any(), any(), any());
+  public void isPermitted_shouldReturnFalse_WhenPermissionIsNotInUserAuthorities() {
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
     boolean result = securityUtils.isPermitted(Permissions.FIND_BADGES);
     assertThat(result).isFalse();
   }
