@@ -1,8 +1,13 @@
 package uk.gov.dft.bluebadge.common.security;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.SecurityConfig;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +22,13 @@ public class SecurityUtils {
   public static final String LOCAL_AUTHORITY_KEY = "local-authority";
   public static final String USER_NAME_KEY = "user_name";
   public static final String CLIENT_ID_KEY = "client_id";
+
+  private final AccessDecisionManager accessDecisionManager;
+
+  @Autowired
+  public SecurityUtils(AccessDecisionManager accessDecisionManager) {
+    this.accessDecisionManager = accessDecisionManager;
+  }
 
   /**
    * @return The user extracted from security context and JWT claims
@@ -100,5 +112,18 @@ public class SecurityUtils {
       throw new IllegalStateException("Principal's local authority is null");
     }
     return currentLocalAuthorityShortCode.equals(localAuthority);
+  }
+
+  public boolean isPermitted(Permissions permission) {
+    try {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      accessDecisionManager.decide(
+          authentication,
+          null,
+          Collections.singletonList(new SecurityConfig(permission.getPermissionName())));
+    } catch (InsufficientAuthenticationException e) {
+      return false;
+    }
+    return true;
   }
 }
