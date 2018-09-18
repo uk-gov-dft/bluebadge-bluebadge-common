@@ -3,10 +3,6 @@ def REPONAME = "${scm.getUserRemoteConfigs()[0].getUrl()}"
 
 node {
 
-    stage('clean workspace') {
-        cleanWs()
-    }
-
     stage('Clone sources') {
       git(
            url: "${REPONAME}",
