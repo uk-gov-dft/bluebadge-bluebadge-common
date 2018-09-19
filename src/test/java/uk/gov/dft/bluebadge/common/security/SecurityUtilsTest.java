@@ -202,9 +202,7 @@ public class SecurityUtilsTest {
   @Test(expected = IllegalStateException.class)
   public void whenNullLA_thenException() {
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
-    claims = ImmutableMap.<String, String>builder()
-        .put("client_id", "fakeClient")
-        .build();
+    claims = ImmutableMap.<String, String>builder().put("client_id", "fakeClient").build();
     setupAuthenticationDetails();
 
     TestLAControlled laControlled =

@@ -30,16 +30,18 @@ import lombok.Getter;
 
 @Getter
 public enum Role {
-  DFT_ADMIN("DfT Admin", PermissionGroups.DFT_ADMIN_PERMS),
-  LA_ADMIN("LA Admin", PermissionGroups.LA_ADMIN_PERMS),
-  LA_EDITOR("LA Editor", PermissionGroups.EDITOR),
-  LA_READ("LA Read Only", PermissionGroups.READ),
-  API_CLIENT("API Client", PermissionGroups.API);
+  DFT_ADMIN(1, "DfT Administrator", PermissionGroups.DFT_ADMIN_PERMS),
+  LA_ADMIN(2, "Administrator", PermissionGroups.LA_ADMIN_PERMS),
+  LA_EDITOR(3, "Editor", PermissionGroups.EDITOR),
+  LA_READ(4, "View Only", PermissionGroups.READ),
+  API_CLIENT(6, "API Client", PermissionGroups.API);
 
   private final Set<Permissions> permissionss;
   private final String prettyName;
+  private final int roleId;
 
-  Role(String prettyName, Set<Permissions> permissions) {
+  Role(int roleId, String prettyName, Set<Permissions> permissions) {
+    this.roleId = roleId;
     this.prettyName = prettyName;
     permissionss = Collections.unmodifiableSet(permissions);
   }
