@@ -1,8 +1,10 @@
 package uk.gov.dft.bluebadge.common.security;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Collection;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +19,9 @@ public class SecurityUtils {
   public static final String LOCAL_AUTHORITY_KEY = "local-authority";
   public static final String USER_NAME_KEY = "user_name";
   public static final String CLIENT_ID_KEY = "client_id";
+
+  @Autowired
+  public SecurityUtils() {}
 
   /**
    * @return The user extracted from security context and JWT claims
@@ -100,5 +105,29 @@ public class SecurityUtils {
       throw new IllegalStateException("Principal's local authority is null");
     }
     return currentLocalAuthorityShortCode.equals(localAuthority);
+  }
+
+  public boolean isPermitted(Permissions permission) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+    if ((auth == null) || (auth.getPrincipal() == null)) {
+      return false;
+    }
+
+    Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+
+    if (authorities == null) {
+      return false;
+    }
+
+    String permissionName = permission.getPermissionName();
+
+    for (GrantedAuthority grantedAuthority : authorities) {
+      if (permissionName.equals(grantedAuthority.getAuthority())) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

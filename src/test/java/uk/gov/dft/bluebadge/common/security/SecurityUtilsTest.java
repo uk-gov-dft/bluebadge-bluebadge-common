@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,9 @@ public class SecurityUtilsTest {
       new UsernamePasswordAuthenticationToken(
           DEFAULT_EMAIL_ADDRESS,
           "bar",
-          Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+          ImmutableSet.of(
+              new SimpleGrantedAuthority("ROLE_USER"),
+              new SimpleGrantedAuthority("PERM_FIND_USERS")));
 
   private SecurityUtils securityUtils;
   private OAuth2Authentication auth2Authentication;
@@ -202,14 +205,26 @@ public class SecurityUtilsTest {
   @Test(expected = IllegalStateException.class)
   public void whenNullLA_thenException() {
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
-    claims = ImmutableMap.<String, String>builder()
-        .put("client_id", "fakeClient")
-        .build();
+    claims = ImmutableMap.<String, String>builder().put("client_id", "fakeClient").build();
     setupAuthenticationDetails();
 
     TestLAControlled laControlled =
         TestLAControlled.builder().localAuthorityShortCode("ABERD").build();
     securityUtils.isAuthorisedLA(laControlled);
+  }
+
+  @Test
+  public void isPermitted_shouldReturnTrue_WhenPermissionIsInUserAuthorities() {
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    boolean result = securityUtils.isPermitted(Permissions.FIND_USERS);
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  public void isPermitted_shouldReturnFalse_WhenPermissionIsNotInUserAuthorities() {
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    boolean result = securityUtils.isPermitted(Permissions.FIND_BADGES);
+    assertThat(result).isFalse();
   }
 
   @Builder
