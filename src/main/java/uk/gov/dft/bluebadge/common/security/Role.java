@@ -53,6 +53,13 @@ public enum Role {
         .orElseThrow(() -> new IllegalArgumentException("No role found for name:" + name));
   }
 
+  public static Role getById(int id) {
+	    return Stream.of(Role.values())
+	        .filter(r -> r.roleId == id)
+	        .findFirst()
+	        .orElseThrow(() -> new IllegalArgumentException("No role found for id:" + id));
+	  }
+
   private static class PermissionGroups {
     private static final Set<Permissions> READ = EnumSet.of(FIND_BADGES, VIEW_BADGE_DETAILS);
 
