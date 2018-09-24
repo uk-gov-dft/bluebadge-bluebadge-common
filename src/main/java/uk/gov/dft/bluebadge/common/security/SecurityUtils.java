@@ -130,10 +130,10 @@ public class SecurityUtils {
   }
 
   public boolean hasRole(Role role) {
-    return null == role ? false : isPermitted("ROLE_" + role.name());
+    return null != role && isPermitted("ROLE_" + role.name());
   }
 
   public boolean isPermitted(Permissions permission) {
-    return null == permission ? false : isPermitted(permission.getPermissionName());
+    return null != permission && isPermitted(permission.getPermissionName());
   }
 }
