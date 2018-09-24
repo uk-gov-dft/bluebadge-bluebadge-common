@@ -102,12 +102,12 @@ public class SecurityUtils {
   public boolean isAuthorisedLA(String localAuthority) {
     String currentLocalAuthorityShortCode = getCurrentLocalAuthorityShortCode();
     if (null == currentLocalAuthorityShortCode) {
-      throw new IllegalStateException("Principal's local authority is null");
+      return hasRole(Role.DFT_ADMIN);
     }
     return currentLocalAuthorityShortCode.equals(localAuthority);
   }
 
-  public boolean isPermitted(Permissions permission) {
+  private boolean isPermitted(String authority) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     if ((auth == null) || (auth.getPrincipal() == null)) {
@@ -120,14 +120,20 @@ public class SecurityUtils {
       return false;
     }
 
-    String permissionName = permission.getPermissionName();
-
     for (GrantedAuthority grantedAuthority : authorities) {
-      if (permissionName.equals(grantedAuthority.getAuthority())) {
+      if (authority.equals(grantedAuthority.getAuthority())) {
         return true;
       }
     }
 
     return false;
+  }
+
+  public boolean hasRole(Role role) {
+    return null == role ? false : isPermitted("ROLE_" + role.name());
+  }
+
+  public boolean isPermitted(Permissions permission) {
+    return null == permission ? false : isPermitted(permission.getPermissionName());
   }
 }
