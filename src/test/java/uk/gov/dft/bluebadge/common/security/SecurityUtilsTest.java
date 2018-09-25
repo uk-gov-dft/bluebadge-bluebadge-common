@@ -9,6 +9,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,7 +49,7 @@ public class SecurityUtilsTest {
 
   private SecurityUtils securityUtils;
   private OAuth2Authentication auth2Authentication;
-  private ImmutableMap<String, String> claims;
+  private Map<String, String> claims;
 
   @Before
   public void setUp() {
@@ -101,6 +103,27 @@ public class SecurityUtilsTest {
     assertThat(currentUserDetails.getEmailAddress()).isEqualTo(DEFAULT_EMAIL_ADDRESS);
     assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_LA_ADMIN");
     assertThat(currentUserDetails.getLocalAuthorityShortCode()).isEqualTo(TEST_LA_SHORT_CODE);
+    assertThat(currentUserDetails.getClientId()).isEqualTo("fakeClient");
+  }
+  @Test
+  public void shouldReturnAValidPrincipal_whenAuthDetailsIsAMapAndLAIsNull() {
+
+    claims = new HashMap<String, String>();
+    claims.put("local-authority", null);
+    claims.put("client_id", "fakeClient");
+    claims.put("user_name", DEFAULT_EMAIL_ADDRESS);
+
+    // given
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    auth2Authentication.setDetails(claims);
+
+    // when
+    BBPrincipal currentUserDetails = securityUtils.getCurrentAuth();
+
+    // then
+    assertThat(currentUserDetails.getEmailAddress()).isEqualTo(DEFAULT_EMAIL_ADDRESS);
+    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_LA_ADMIN");
+    assertThat(currentUserDetails.getLocalAuthorityShortCode()).isNull();
     assertThat(currentUserDetails.getClientId()).isEqualTo("fakeClient");
   }
 

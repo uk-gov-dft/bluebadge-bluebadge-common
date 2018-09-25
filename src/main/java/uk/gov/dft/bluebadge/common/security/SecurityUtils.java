@@ -2,6 +2,7 @@ package uk.gov.dft.bluebadge.common.security;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class SecurityUtils {
           (OAuth2AuthenticationDetails) authentication.getDetails();
       additionalInfo = (Map<String, String>) oauthDetails.getDecodedDetails();
     } else if ((authentication.getDetails() instanceof Map)) {
-      additionalInfo = ImmutableMap.copyOf((Map) authentication.getDetails());
+      additionalInfo = Collections.unmodifiableMap((Map) authentication.getDetails());
     } else {
       // Backward compatible to allow older services to use the latest security utils.
       log.warn("Old security authentication being used. Using hard coded local authority!");
