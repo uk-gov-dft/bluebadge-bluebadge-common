@@ -105,6 +105,7 @@ public class SecurityUtilsTest {
     assertThat(currentUserDetails.getLocalAuthorityShortCode()).isEqualTo(TEST_LA_SHORT_CODE);
     assertThat(currentUserDetails.getClientId()).isEqualTo("fakeClient");
   }
+
   @Test
   public void shouldReturnAValidPrincipal_whenAuthDetailsIsAMapAndLAIsNull() {
 
@@ -198,6 +199,16 @@ public class SecurityUtilsTest {
     TestLAControlled laControlled =
         TestLAControlled.builder().localAuthorityShortCode(TEST_LA_SHORT_CODE).build();
     boolean result = securityUtils.isAuthorisedLA(laControlled);
+
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  public void whenSameLACode_thenAuthorised() {
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    setupAuthenticationDetails();
+
+    boolean result = securityUtils.isAuthorisedLACode(TEST_LA_SHORT_CODE);
 
     assertThat(result).isTrue();
   }

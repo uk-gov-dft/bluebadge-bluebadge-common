@@ -97,10 +97,10 @@ public class SecurityUtils {
   }
 
   public boolean isAuthorisedLA(LocalAuthorityControlled localAuthorityControlled) {
-    return isAuthorisedLA(localAuthorityControlled.getLocalAuthorityShortCode());
+    return isAuthorisedLACode(localAuthorityControlled.getLocalAuthorityShortCode());
   }
 
-  public boolean isAuthorisedLA(String localAuthority) {
+  public boolean isAuthorisedLACode(String localAuthority) {
     String currentLocalAuthorityShortCode = getCurrentLocalAuthorityShortCode();
     if (null == currentLocalAuthorityShortCode) {
       return hasRole(Role.DFT_ADMIN);
