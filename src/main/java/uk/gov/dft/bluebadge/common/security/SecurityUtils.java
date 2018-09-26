@@ -2,6 +2,7 @@ package uk.gov.dft.bluebadge.common.security;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class SecurityUtils {
           (OAuth2AuthenticationDetails) authentication.getDetails();
       additionalInfo = (Map<String, String>) oauthDetails.getDecodedDetails();
     } else if ((authentication.getDetails() instanceof Map)) {
-      additionalInfo = ImmutableMap.copyOf((Map) authentication.getDetails());
+      additionalInfo = Collections.unmodifiableMap((Map) authentication.getDetails());
     } else {
       // Backward compatible to allow older services to use the latest security utils.
       log.warn("Old security authentication being used. Using hard coded local authority!");
@@ -96,18 +97,18 @@ public class SecurityUtils {
   }
 
   public boolean isAuthorisedLA(LocalAuthorityControlled localAuthorityControlled) {
-    return isAuthorisedLA(localAuthorityControlled.getLocalAuthorityShortCode());
+    return isAuthorisedLACode(localAuthorityControlled.getLocalAuthorityShortCode());
   }
 
-  public boolean isAuthorisedLA(String localAuthority) {
+  public boolean isAuthorisedLACode(String localAuthority) {
     String currentLocalAuthorityShortCode = getCurrentLocalAuthorityShortCode();
     if (null == currentLocalAuthorityShortCode) {
-      throw new IllegalStateException("Principal's local authority is null");
+      return hasRole(Role.DFT_ADMIN);
     }
     return currentLocalAuthorityShortCode.equals(localAuthority);
   }
 
-  public boolean isPermitted(Permissions permission) {
+  private boolean isPermitted(String authority) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     if ((auth == null) || (auth.getPrincipal() == null)) {
@@ -120,14 +121,20 @@ public class SecurityUtils {
       return false;
     }
 
-    String permissionName = permission.getPermissionName();
-
     for (GrantedAuthority grantedAuthority : authorities) {
-      if (permissionName.equals(grantedAuthority.getAuthority())) {
+      if (authority.equals(grantedAuthority.getAuthority())) {
         return true;
       }
     }
 
     return false;
+  }
+
+  public boolean hasRole(Role role) {
+    return null != role && isPermitted("ROLE_" + role.name());
+  }
+
+  public boolean isPermitted(Permissions permission) {
+    return null != permission && isPermitted(permission.getPermissionName());
   }
 }

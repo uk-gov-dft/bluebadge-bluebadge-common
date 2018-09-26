@@ -33,7 +33,7 @@ public enum Role {
   DFT_ADMIN(1, "DfT Administrator", PermissionGroups.DFT_ADMIN_PERMS),
   LA_ADMIN(2, "Administrator", PermissionGroups.LA_ADMIN_PERMS),
   LA_EDITOR(3, "Editor", PermissionGroups.EDITOR),
-  LA_READ(4, "View Only", PermissionGroups.READ),
+  LA_READ(4, "View only", PermissionGroups.READ),
   API_CLIENT(6, "API Client", PermissionGroups.API);
 
   private final Set<Permissions> permissionss;
@@ -54,11 +54,11 @@ public enum Role {
   }
 
   public static Role getById(int id) {
-	    return Stream.of(Role.values())
-	        .filter(r -> r.roleId == id)
-	        .findFirst()
-	        .orElseThrow(() -> new IllegalArgumentException("No role found for id:" + id));
-	  }
+    return Stream.of(Role.values())
+        .filter(r -> r.roleId == id)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("No role found for id:" + id));
+  }
 
   private static class PermissionGroups {
     private static final Set<Permissions> READ = EnumSet.of(FIND_BADGES, VIEW_BADGE_DETAILS);

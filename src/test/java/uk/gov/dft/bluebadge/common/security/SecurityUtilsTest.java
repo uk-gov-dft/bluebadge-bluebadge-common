@@ -9,6 +9,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,12 +44,12 @@ public class SecurityUtilsTest {
           DEFAULT_EMAIL_ADDRESS,
           "bar",
           ImmutableSet.of(
-              new SimpleGrantedAuthority("ROLE_USER"),
+              new SimpleGrantedAuthority("ROLE_" + Role.LA_ADMIN),
               new SimpleGrantedAuthority("PERM_FIND_USERS")));
 
   private SecurityUtils securityUtils;
   private OAuth2Authentication auth2Authentication;
-  private ImmutableMap<String, String> claims;
+  private Map<String, String> claims;
 
   @Before
   public void setUp() {
@@ -82,7 +84,7 @@ public class SecurityUtilsTest {
 
     // then
     assertThat(currentUserDetails.getEmailAddress()).isEqualTo(DEFAULT_EMAIL_ADDRESS);
-    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_USER");
+    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_LA_ADMIN");
     assertThat(currentUserDetails.getLocalAuthorityShortCode()).isEqualTo(TEST_LA_SHORT_CODE);
     assertThat(currentUserDetails.getClientId()).isEqualTo("fakeClient");
   }
@@ -99,8 +101,30 @@ public class SecurityUtilsTest {
 
     // then
     assertThat(currentUserDetails.getEmailAddress()).isEqualTo(DEFAULT_EMAIL_ADDRESS);
-    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_USER");
+    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_LA_ADMIN");
     assertThat(currentUserDetails.getLocalAuthorityShortCode()).isEqualTo(TEST_LA_SHORT_CODE);
+    assertThat(currentUserDetails.getClientId()).isEqualTo("fakeClient");
+  }
+
+  @Test
+  public void shouldReturnAValidPrincipal_whenAuthDetailsIsAMapAndLAIsNull() {
+
+    claims = new HashMap<String, String>();
+    claims.put("local-authority", null);
+    claims.put("client_id", "fakeClient");
+    claims.put("user_name", DEFAULT_EMAIL_ADDRESS);
+
+    // given
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    auth2Authentication.setDetails(claims);
+
+    // when
+    BBPrincipal currentUserDetails = securityUtils.getCurrentAuth();
+
+    // then
+    assertThat(currentUserDetails.getEmailAddress()).isEqualTo(DEFAULT_EMAIL_ADDRESS);
+    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_LA_ADMIN");
+    assertThat(currentUserDetails.getLocalAuthorityShortCode()).isNull();
     assertThat(currentUserDetails.getClientId()).isEqualTo("fakeClient");
   }
 
@@ -116,7 +140,7 @@ public class SecurityUtilsTest {
 
     // then
     assertThat(currentUserDetails.getEmailAddress()).isEqualTo(DEFAULT_EMAIL_ADDRESS);
-    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_USER");
+    assertThat(currentUserDetails.getRoleName()).isEqualTo("ROLE_LA_ADMIN");
     assertThat(currentUserDetails.getLocalAuthorityShortCode()).isEqualTo(TEST_LA_SHORT_CODE);
   }
 
@@ -180,6 +204,16 @@ public class SecurityUtilsTest {
   }
 
   @Test
+  public void whenSameLACode_thenAuthorised() {
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    setupAuthenticationDetails();
+
+    boolean result = securityUtils.isAuthorisedLACode(TEST_LA_SHORT_CODE);
+
+    assertThat(result).isTrue();
+  }
+
+  @Test
   public void whenDifferentLA_thenNotAuthorised() {
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
     setupAuthenticationDetails();
@@ -202,15 +236,34 @@ public class SecurityUtilsTest {
     assertThat(result).isFalse();
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void whenNullLA_thenException() {
+  @Test
+  public void whenUserHasNoLA_andNotDftUser_thenNotAuthorised() {
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
     claims = ImmutableMap.<String, String>builder().put("client_id", "fakeClient").build();
     setupAuthenticationDetails();
 
     TestLAControlled laControlled =
         TestLAControlled.builder().localAuthorityShortCode("ABERD").build();
-    securityUtils.isAuthorisedLA(laControlled);
+    assertThat(securityUtils.isAuthorisedLA(laControlled)).isFalse();
+  }
+
+  @Test
+  public void whenUserHasNoLA_andDftUser_thenAuthorised() {
+    userAuthentication =
+        new UsernamePasswordAuthenticationToken(
+            DEFAULT_EMAIL_ADDRESS,
+            "bar",
+            ImmutableSet.of(
+                new SimpleGrantedAuthority("ROLE_" + Role.DFT_ADMIN.name()),
+                new SimpleGrantedAuthority("PERM_FIND_USERS")));
+    auth2Authentication = new OAuth2Authentication(request, userAuthentication);
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    claims = ImmutableMap.<String, String>builder().put("client_id", "fakeClient").build();
+    setupAuthenticationDetails();
+
+    TestLAControlled laControlled =
+        TestLAControlled.builder().localAuthorityShortCode("ABERD").build();
+    assertThat(securityUtils.isAuthorisedLA(laControlled)).isTrue();
   }
 
   @Test
@@ -224,6 +277,32 @@ public class SecurityUtilsTest {
   public void isPermitted_shouldReturnFalse_WhenPermissionIsNotInUserAuthorities() {
     when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
     boolean result = securityUtils.isPermitted(Permissions.FIND_BADGES);
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void isPermitted_shouldReturnFalse_whenNull() {
+    boolean result = securityUtils.isPermitted(null);
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void hasRole_shouldReturnTrue_WhenUserHasRole() {
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    boolean result = securityUtils.hasRole(Role.LA_ADMIN);
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  public void hasRole_shouldReturnFalse_WhenUserDoesntHasRole() {
+    when(mockSecurityContext.getAuthentication()).thenReturn(auth2Authentication);
+    boolean result = securityUtils.hasRole(Role.DFT_ADMIN);
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void hasRole_shouldReturnFalse_whenNull() {
+    boolean result = securityUtils.hasRole(null);
     assertThat(result).isFalse();
   }
 
